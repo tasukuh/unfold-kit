@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unfold Kit</title>
+<meta name="description" content="App Store の新しいクリエイティブ素材と iPhone Duo 対応のための、無料・登録不要のブラウザツール集。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+JP:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap">
+<style>
+/* Layout: a short statement, then the two tools side by side as the only actions on the page. */
+:root{
+  --paper:#F3F5F9; --surface:#FFFFFF; --ink:#161C2E; --ink-2:#5A6379; --rule:#D5DAE5;
+  --accent:#3246C6; --fold:#D98A1C; --fold-soft:#F7E3C4;
+  --f-display:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0F121B; --surface:#171B27; --ink:#E6E9F2; --ink-2:#9AA3B8; --rule:#2A3043;
+  --accent:#8C98FF; --fold:#F0B357; --fold-soft:#4A3A1E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0F121B; --surface:#171B27; --ink:#E6E9F2; --ink-2:#9AA3B8; --rule:#2A3043;
+  --accent:#8C98FF; --fold:#F0B357; --fold-soft:#4A3A1E; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.7;padding-inline:20px;padding-block:0 48px}
+.wrap{max-width:980px;margin:0 auto}
+header{padding-block:56px 36px;display:grid;gap:14px}
+h1{font-family:var(--f-display);font-weight:900;font-size:clamp(34px,6vw,56px);line-height:1.1;margin:0;letter-spacing:-.01em}
+h1 .crease{display:inline-block;border-left:3px dashed var(--fold);margin:0 .12em;height:.9em;vertical-align:-.08em}
+.lede{font-size:17px;color:var(--ink-2);max-width:60ch;margin:0;text-wrap:pretty}
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:20px}
+.tool{display:grid;gap:10px;align-content:start;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:24px;color:inherit;text-decoration:none}
+.tool:hover{border-color:var(--accent)}
+.tool:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.tool h2{font-family:var(--f-display);font-weight:900;font-size:24px;margin:0}
+.tool .what{font-weight:600}
+.tool p{margin:0;color:var(--ink-2)}
+.tool ul{margin:4px 0 0;padding-left:1.1em;color:var(--ink-2);font-size:14px}
+.tool .go{color:var(--accent);font-weight:600;margin-top:6px}
+.dims{font-family:var(--f-data);font-size:12.5px;color:var(--ink-2)}
+.facts{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px 28px;border-top:1px solid var(--rule);padding-top:24px}
+.facts div{display:grid;gap:2px}
+.facts b{font-family:var(--f-display);font-size:16px}
+.facts span{color:var(--ink-2);font-size:14px}
+footer{margin-top:40px;font-size:12px;color:var(--ink-2)}
+footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Unfold<span class="crease" aria-hidden="true"></span>Kit</h1>
+  <p class="lede">2026 年秋の App Store と iPhone Duo の変更に、今日から備えるための無料ツールです。登録不要、画像はブラウザの外に出ません。</p>
+</header>
+
+<main class="tools">
+  <a class="tool" href="/asset-press">
+    <h2>Asset Press</h2>
+    <span class="what">App Store の新しいクリエイティブ素材を作る</span>
+    <p>プロダクトページヘッダー、検索結果アセット、iPhone Duo スクリーンショットを、規定サイズぴったり・アルファなし PNG で書き出します。</p>
+    <ul>
+      <li>Apple テンプレートのセーフエリアを表示</li>
+      <li>価格・URL・表彰表記などを提出前にチェック</li>
+      <li>3 種類のクリエイティブを一括書き出し</li>
+    </ul>
+    <span class="dims">3840×1646 ・ 3840×2560 ・ 5244×2950 ・ 1398×2034 ・ 2007×2853</span>
+    <span class="go">Asset Press を開く</span>
+  </a>
+  <a class="tool" href="/fold-planner">
+    <h2>Fold Planner</h2>
+    <span class="what">iPhone Duo でのレイアウトを提案する</span>
+    <p>アプリの種類を選ぶと、閉じた状態・開いた状態・半開きなど 6 つのポーズでの推奨レイアウトを同じ縮尺の図で示します。</p>
+    <ul>
+      <li>折り目・縦に並ぶツールバーを反映した図</li>
+      <li>API 名つきの実装チェックリスト</li>
+      <li>Markdown でチケットや README に貼れる</li>
+    </ul>
+    <span class="dims">外側 466×678pt ・ 内側 669×951pt(推定)</span>
+    <span class="go">Fold Planner を開く</span>
+  </a>
+</main>
+
+<section class="facts" aria-label="主な日付">
+  <div><b>10 月 5 日</b><span>ヘッダー・検索結果アセットと Duo のスクリーンショット提出が開始</span></div>
+  <div><b>10 月 23 日</b><span>iPhone Duo 発売(iOS 27.1)</span></div>
+  <div><b>2027 年 4 月</b><span>提出時に iPhone Duo のスクリーンショットが必須に</span></div>
+</section>
+
+<footer>
+  <p>Apple、App Store、iPhone は Apple Inc. の商標です。このサイトは Apple とは関係のない非公式ツールです。 ・ <a href="https://github.com/tasukuh/unfold-kit" target="_blank" rel="noopener" id="repoLink">ソースコード(MIT)</a></p>
+</footer>
+</div>
+</body>
+</html>

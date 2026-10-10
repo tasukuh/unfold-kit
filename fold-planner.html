@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fold Planner</title>
+<meta name="description" content="アプリの種類を選ぶと、iPhone Duo の外側・内側・半開きなど6つのポーズでの推奨レイアウトと、実装チェックリストを提案する無料ツール。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+JP:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<style>
+/* Layout: an input band (what kind of app) → summary → six device poses drawn at one true scale → checklist → reference. */
+:root{
+  --paper:#F3F5F9; --surface:#FFFFFF; --ink:#161C2E; --ink-2:#5A6379; --rule:#D5DAE5;
+  --accent:#3246C6; --accent-ink:#FFFFFF; --accent-soft:#DDE2FA;
+  --fold:#D98A1C; --fold-soft:#F7E3C4;
+  --screen:#FBFCFE; --wire:#C9D0DE; --wire-2:#E6EAF2; --dark:#1D2337; --map:#E4EEDF; --road:#FFFFFF;
+  --ok:#1E7A4C;
+  --f-display:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0F121B; --surface:#171B27; --ink:#E6E9F2; --ink-2:#9AA3B8; --rule:#2A3043;
+  --accent:#8C98FF; --accent-ink:#0F121B; --accent-soft:#2A3160;
+  --fold:#F0B357; --fold-soft:#4A3A1E;
+  --screen:#1C2130; --wire:#3A4258; --wire-2:#283044; --dark:#070910; --map:#22302A; --road:#3A4A42;
+  --ok:#5BD08F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0F121B; --surface:#171B27; --ink:#E6E9F2; --ink-2:#9AA3B8; --rule:#2A3043;
+  --accent:#8C98FF; --accent-ink:#0F121B; --accent-soft:#2A3160;
+  --fold:#F0B357; --fold-soft:#4A3A1E;
+  --screen:#1C2130; --wire:#3A4258; --wire-2:#283044; --dark:#070910; --map:#22302A; --road:#3A4A42;
+  --ok:#5BD08F; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.65;padding-inline:20px;padding-block:0 48px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto}
+
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;padding-block:20px 16px;border-bottom:1px solid var(--rule);margin-bottom:24px}
+.brand{font-family:var(--f-display);font-weight:900;font-size:22px;margin:0}
+.brand small{font-weight:500;font-size:13px;color:var(--ink-2);margin-left:10px;display:inline-block}
+.top nav{margin-left:auto;display:flex;gap:16px;font-size:13px}
+
+h2{font-family:var(--f-display);font-weight:700;font-size:19px;margin:0 0 4px;text-wrap:balance}
+.lead{color:var(--ink-2);margin:0 0 14px;max-width:70ch}
+
+.intro{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px;align-items:start;margin-bottom:36px}
+@media (max-width:860px){.intro{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:18px}
+.lbl{font-size:12px;color:var(--ink-2);font-weight:500;display:block;margin-bottom:6px}
+.cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.chip{position:relative;display:inline-flex;align-items:center;font-size:13px;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;cursor:pointer;background:var(--paper)}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip:has(input:checked){background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 14px}
+.mods label{display:flex;gap:8px;align-items:flex-start;font-size:13px;cursor:pointer;line-height:1.5;padding-block:3px}
+.mods input{accent-color:var(--accent);margin-top:3px}
+
+.summary h3{font-family:var(--f-display);font-weight:700;font-size:15px;margin:0 0 10px}
+.summary ol{margin:0;padding-left:1.3em;display:grid;gap:10px}
+.summary li{padding-left:2px}
+.summary li b{display:block;font-weight:600}
+.summary .best{margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-2)}
+.summary .best strong{color:var(--ink)}
+
+.poses-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:8px 20px;margin-bottom:14px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:14px;height:10px;border-radius:2px;display:inline-block}
+.poses{display:flex;flex-wrap:wrap;gap:28px 24px;align-items:flex-start;margin-bottom:40px}
+.pose{display:grid;gap:8px;max-width:100%;min-width:0}
+.pose svg{display:block;width:100%;height:auto}
+.pose figcaption{display:grid;gap:2px;max-width:100%}
+.pose .pn{font-weight:600;font-size:14px}
+.pose .ps{font-family:var(--f-data);font-size:11.5px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.pose .pnote{font-size:13px;color:var(--ink);line-height:1.55}
+.pose.best .pn::after{content:"おすすめ";font-family:var(--f-body);font-size:11px;font-weight:600;color:var(--accent-ink);background:var(--accent);border-radius:4px;padding:1px 6px;margin-left:8px;vertical-align:2px}
+
+.checklist{display:grid;gap:22px;margin-bottom:40px}
+.cl-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:10px}
+.cl-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:600;font-size:13px;border-radius:7px;padding:8px 12px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.status{font-size:12.5px;color:var(--ink-2);min-height:1.4em}
+.group h3{font-family:var(--f-display);font-weight:700;font-size:15px;margin:0 0 6px}
+.group ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.group li label{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;padding:7px 0;border-bottom:1px solid var(--rule);cursor:pointer}
+.group li:last-child label{border-bottom:0}
+.group input{accent-color:var(--accent);margin-top:4px}
+.group .t{font-weight:500}
+.group .d{display:block;color:var(--ink-2);font-size:13px;margin-top:1px}
+.group input:checked + span .t{text-decoration:line-through;color:var(--ink-2)}
+code{font-family:var(--f-data);font-size:12px;background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:0 4px;overflow-wrap:anywhere}
+
+.table-scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:7px 12px 7px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:600;color:var(--ink-2);font-size:12px}
+td.num{font-family:var(--f-data);white-space:nowrap;font-variant-numeric:tabular-nums}
+footer{margin-top:32px;font-size:12px;color:var(--ink-2);display:grid;gap:4px;max-width:80ch}
+
+/* SVG roles */
+.s-frame{fill:var(--screen);stroke:var(--ink-2);stroke-width:3}
+.s-chrome{fill:var(--wire-2)}
+.s-wire{fill:var(--wire)}
+.s-soft{fill:var(--wire-2)}
+.s-line{stroke:var(--wire);stroke-width:5;stroke-linecap:round;fill:none}
+.s-dark{fill:var(--dark)}
+.s-accent{fill:var(--accent)}
+.s-accent-soft{fill:var(--accent-soft)}
+.s-accent-line{stroke:var(--accent);stroke-width:4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.s-map{fill:var(--map)}
+.s-road{stroke:var(--road);stroke-width:9;fill:none;stroke-linecap:round}
+.s-fold{fill:var(--fold-soft)}
+.s-foldline{stroke:var(--fold);stroke-width:2;stroke-dasharray:6 5}
+.s-other{fill:var(--wire-2);opacity:.55}
+.s-label{font-family:var(--f-body);font-size:25px;font-weight:600;fill:var(--ink)}
+.s-labelbg{fill:var(--surface);opacity:.92}
+.s-foldtxt{font-family:var(--f-body);font-size:17px;font-weight:600;fill:var(--fold)}
+.s-white{fill:#FFFFFF;opacity:.9}
+.s-tiny{font-family:var(--f-body);font-size:16px;fill:var(--ink-2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <h1 class="brand">Fold Planner<small>iPhone Duo レイアウト提案</small></h1>
+  <nav><!--repo-only--><a href="/">Unfold Kit</a><a href="/asset-press">Asset Press</a><!--/repo-only--><a href="#checklist">チェックリスト</a><a href="#specs">仕様</a></nav>
+</header>
+
+<section class="intro">
+  <div class="box">
+    <h2>あなたのアプリについて</h2>
+    <p class="lead">種類を選ぶと、閉じた状態・開いた状態・半開きなど 6 つのポーズでの推奨レイアウトと、やることリストが下に出ます。</p>
+    <span class="lbl" id="catLbl">アプリの種類</span>
+    <div class="cats" id="cats" role="radiogroup" aria-labelledby="catLbl"></div>
+    <span class="lbl">当てはまるもの</span>
+    <div class="mods" id="mods"></div>
+  </div>
+  <div class="box summary" aria-live="polite">
+    <h3 id="sumTitle">まず押さえる 3 点</h3>
+    <ol id="summary"></ol>
+    <p class="best" id="best"></p>
+  </div>
+</section>
+
+<section>
+  <div class="poses-head">
+    <div>
+      <h2>6 つのポーズでの見え方</h2>
+      <p class="lead" style="margin:0">すべて同じ縮尺(ポイント単位)で描いています。内側ディスプレイのポイント値は App Store Connect のスクリーンショット寸法からの推定です。</p>
+    </div>
+    <div class="legend" aria-hidden="true">
+      <span><i style="background:var(--wire-2)"></i>システムのバー</span>
+      <span><i style="background:var(--fold-soft);outline:1px dashed var(--fold)"></i>折り目(予約領域)</span>
+      <span><i style="background:var(--accent)"></i>主な操作</span>
+    </div>
+  </div>
+  <div class="poses" id="poses"></div>
+</section>
+
+<section class="checklist" id="checklist">
+  <div class="cl-head">
+    <div>
+      <h2>実装チェックリスト</h2>
+      <p class="lead" style="margin:0">チェックした状態はこのブラウザに保存されます。Markdown にしてチケットや README に貼れます。</p>
+    </div>
+    <div class="cl-actions">
+      <button type="button" class="btn" id="copyMd">Markdown をコピー</button>
+      <button type="button" class="btn ghost" id="saveMd">.md で保存</button>
+    </div>
+  </div>
+  <div class="status" id="status" role="status"></div>
+  <div id="groups" class="checklist" style="margin:0"></div>
+</section>
+
+<section class="box" id="specs">
+  <h2>iPhone Duo のディスプレイ</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th>ディスプレイ</th><th>パネル(px)</th><th>スクリーンショット(px)</th><th>ポイント(3x)</th><th>サイズクラス</th></tr></thead>
+    <tbody>
+      <tr><td>外側 5.4 インチ</td><td class="num">1398 × 2034</td><td class="num">1398 × 2034</td><td class="num">466 × 678</td><td>縦: 幅 Compact / 高さ Regular。横: どちらも Compact</td></tr>
+      <tr><td>内側 7.6 インチ</td><td class="num">1878 × 2670</td><td class="num">2007 × 2853</td><td class="num">669 × 951(推定)</td><td>縦横とも Regular。対応する向きの設定は無視される</td></tr>
+      <tr><td>参考: iPhone 18 Pro Max</td><td class="num">1320 × 2868</td><td class="num">1320 × 2868</td><td class="num">440 × 956</td><td>縦: 幅 Compact / 高さ Regular</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer>
+  <p>この提案は Apple の Human Interface Guidelines「Designing for iPhone Duo」と Tech Talk の内容をもとにした一般的なパターンです。最終的な確認は Xcode 27.1 の Device Hub(iPhone Duo シミュレーター)で行ってください。</p>
+  <p>出典: <a href="https://developer.apple.com/design/human-interface-guidelines/designing-for-iphone-duo" target="_blank" rel="noopener">Designing for iPhone Duo (HIG)</a> / <a href="https://developer.apple.com/documentation/technologyoverviews/preparing-your-app-for-iphone-duo" target="_blank" rel="noopener">Preparing your app for iPhone Duo</a> / <a href="https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications" target="_blank" rel="noopener">Screenshot specifications</a> / <a href="https://blakecrosley.com/blog/iphone-duo-for-developers" target="_blank" rel="noopener">iPhone Duo for Developers (Blake Crosley)</a></p>
+  <p>Apple、iPhone は Apple Inc. の商標です。このツールは Apple とは関係のない非公式ツールです。</p>
+</footer>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+
+/* ---------- Poses (points) ---------- */
+const POSES = [
+  {id:"outer", name:"閉じた状態", w:466, h:678, bars:"side", camera:true, spec:"外側 466×678pt ・ 幅 Compact"},
+  {id:"innerL", name:"開いた状態・横", w:951, h:669, bars:"side", spec:"内側 951×669pt ・ 幅 Regular"},
+  {id:"innerP", name:"開いた状態・縦", w:669, h:951, bars:"top", spec:"内側 669×951pt ・ 幅 Regular ・ バーは上下"},
+  {id:"book", name:"半開き・ブック", w:951, h:669, bars:"side", fold:"v", spec:"内側を本のように開く ・ 折り目は縦"},
+  {id:"tabletop", name:"半開き・テーブルトップ", w:669, h:951, bars:"top", fold:"h", spec:"机に置いて L 字に開く ・ 折り目は横"},
+  {id:"split", name:"Split View(2 アプリ)", w:951, h:669, bars:"side", split:true, spec:"内側を 2 アプリで分割 ・ 自分の側は Compact 幅"},
+];
+const RAIL = 56, FOLD = 22, SCALE = 0.46;
+
+/* ---------- Layout patterns ---------- */
+const PATTERNS = {
+  listDetail:{kinds:["list","detail"],
+    outer:{arr:"single", note:"一覧だけを表示し、詳細はタップでプッシュ遷移。バーは右端に縦並び。"},
+    innerL:{arr:"side", r:.36, note:"一覧と詳細を左右に並べる。分割ビューが自動で展開する。"},
+    innerP:{arr:"side", r:.42, note:"縦でも幅は Regular なので 2 カラムを維持。バーは上下に戻る。"},
+    book:{arr:"fold", note:"折り目を境に一覧と詳細をほぼ同じ幅に。標準の分割ビューは自動でこう調整される。"},
+    tabletop:{arr:"fold", swap:true, note:"上半分で読み、手元の下半分で選ぶ。"},
+    split:{arr:"single", note:"画面の半分は Compact 幅。外側と同じ 1 カラムに戻る。"},
+    headline:"閉じたら 1 カラム、開いたら一覧と詳細の 2 カラム。この切り替えをサイズクラスだけで行う。",
+    best:"book"},
+  feed:{kinds:["feed","detail"],
+    outer:{arr:"single", note:"1 カラムのフィード。横幅が広いので画像は少し低めの比率に。"},
+    innerL:{arr:"side", r:.52, note:"フィードは読みやすい幅に保ち、右に詳細や返信を出す。"},
+    innerP:{arr:"single", cols:2, note:"1 カラムを引き伸ばさず、2 列のカードにする。"},
+    book:{arr:"fold", note:"左でスクロール、右で開いた投稿を読む。"},
+    tabletop:{arr:"fold", swap:true, note:"上半分に投稿や動画、下半分に返信や入力欄。"},
+    split:{arr:"single", note:"1 カラムのフィードに戻る。"},
+    headline:"1 カラムを横に引き伸ばさない。広い画面では「詳細を横に出す」か「列を増やす」。",
+    best:"innerL"},
+  media:{kinds:["media","controls"],
+    outer:{arr:"stack", r:"16:9", note:"上にメディア、下に操作と情報。"},
+    innerL:{arr:"letterbox", note:"16:9 だと上下に計 130〜170pt の余白が出る。黒帯にせず、字幕・チャプター・操作を置く。"},
+    innerP:{arr:"stack", r:"16:9", note:"上にメディア、下に情報。縦に長いので一覧も見せられる。"},
+    book:{arr:"fold", note:"重ねて表示していたビューが、半開きでは左右に分かれる(オーバーレイ配置)。"},
+    tabletop:{arr:"fold", note:"上半分で視聴、下半分で操作。机に置いたまま使える一番の見せ場。"},
+    split:{arr:"stack", r:"16:9", note:"半分の幅でも上下構成で成立させる。"},
+    headline:"重ねて表示 ⇄ 左右・上下に分ける、のオーバーレイ配置が基本。",
+    best:"tabletop"},
+  grid:{kinds:["grid","detail"],
+    outer:{arr:"single", cols:3, note:"3 列のグリッド。外側には折り目がない。"},
+    innerL:{arr:"single", cols:6, note:"6 列。偶数列にしておくと半開きのときに真ん中で割れない。"},
+    innerP:{arr:"single", cols:4, note:"4 列。セルの大きさは外側とほぼ同じに保つ。"},
+    book:{arr:"fold", cols:2, note:"左にグリッド、右に選んだ項目の詳細。"},
+    tabletop:{arr:"fold", swap:true, cols:4, note:"上に選んだ項目を大きく、下でグリッドを選ぶ。"},
+    split:{arr:"single", cols:2, note:"2 列に減らす。"},
+    headline:"列数は偶数(内側横 6 列・縦 4 列)。折り目の上にセルを置かない。",
+    best:"book"},
+  canvas:{kinds:["canvas","panel"],
+    outer:{arr:"single", note:"キャンバスを最大に。ツールは右端の縦バーに。"},
+    innerL:{arr:"side", r:.74, note:"キャンバスの右にインスペクタ。"},
+    innerP:{arr:"stack", r:.72, note:"キャンバスの下にツールパネル。"},
+    book:{arr:"fold", note:"左右に分割。作品は折り目をまたがないよう片側に収める。"},
+    tabletop:{arr:"fold", note:"上半分がキャンバス、下半分がパレットやキーボード。"},
+    split:{arr:"single", note:"キャンバスのみ。パネルはシートで出す。"},
+    headline:"作業面と道具を分割配置(スプリット配置)にし、半開きでは道具を手元側へ。",
+    best:"tabletop"},
+  map:{kinds:["map","list"],
+    outer:{arr:"overlay", note:"地図の上に下からシート。"},
+    innerL:{arr:"overlay", note:"地図を全面に、検索結果は左上の浮いたパネルに。"},
+    innerP:{arr:"overlay", note:"地図の上に下からシート。"},
+    book:{arr:"fold", swap:true, note:"左に検索結果・経路、右に地図。地図は折り目をまたがせない。"},
+    tabletop:{arr:"fold", note:"上半分に地図、下半分に経路案内。"},
+    split:{arr:"overlay", note:"シートが半分の幅に収まる。"},
+    headline:"地図は全面、情報は重ねるパネル。半開きでは地図と情報を左右・上下に分ける。",
+    best:"book"},
+  dashboard:{kinds:["chart","cards"],
+    outer:{arr:"stack", r:.4, note:"上にグラフ、下に指標カード 2 列。"},
+    innerL:{arr:"side", r:.52, note:"左にグラフ、右に指標カード 2×2。"},
+    innerP:{arr:"stack", r:.36, note:"上にグラフ、下に指標カード。"},
+    book:{arr:"fold", note:"左にグラフ、右に指標。グラフを折り目でまたがせない。"},
+    tabletop:{arr:"fold", note:"上にグラフ、下に指標カード。"},
+    split:{arr:"stack", r:.4, note:"上下構成に戻る。"},
+    headline:"カードは偶数列で並べ、グラフは片側に収める。",
+    best:"innerL"},
+  reader:{kinds:["page","page"],
+    outer:{arr:"single", note:"1 ページずつ表示。"},
+    innerL:{arr:"side", r:.5, note:"見開き 2 ページ。境目を画面の中心(折り目の位置)に合わせる。"},
+    innerP:{arr:"single", note:"1 ページを大きく。"},
+    book:{arr:"fold", note:"本物の本のように見開きで読む。1 ページが折り目をまたがないこと。"},
+    tabletop:{arr:"fold", note:"上に本文、下に目次・メモ。"},
+    split:{arr:"single", note:"1 ページ表示に戻る。"},
+    headline:"√2 に近い内側画面は見開き向き。ページの境目は必ず中心に。",
+    best:"book"},
+  game:{kinds:["game","pad"], fullBleed:true,
+    outer:{arr:"single", note:"全画面。バーは出さず、HUD は右上カメラの位置を避ける。"},
+    innerL:{arr:"single", note:"レターボックスにせず、表示範囲(アスペクト比)を広げて埋める。"},
+    innerP:{arr:"single", note:"向きを固定していても画面を埋める。"},
+    book:{arr:"fold", note:"片側にゲーム、もう片側にマップや持ち物。"},
+    tabletop:{arr:"fold", note:"上半分がゲーム、下半分が操作パッド。"},
+    split:{arr:"single", note:"縮小されても文字とボタンの大きさは保つ。"},
+    headline:"どのポーズでも画面を埋める。黒帯より表示範囲を変える方を優先。",
+    best:"tabletop"},
+  camera:{kinds:["viewfinder","shutter"], fullBleed:false,
+    outer:{arr:"single", note:"ファインダーを全面に。シャッターは右端の縦バー側。"},
+    innerL:{arr:"side", r:.8, note:"大きなファインダーと操作列。"},
+    innerP:{arr:"stack", r:.8, note:"ファインダーの下にシャッター。"},
+    book:{arr:"fold", note:"左でファインダー、右で撮った写真を確認。"},
+    tabletop:{arr:"fold", note:"机に立てて上半分がファインダー、下半分が操作。セルフタイマー撮影向き。"},
+    split:{arr:"single", note:"ファインダーのみ。"},
+    headline:"内側・外側のカメラ切り替えと、被写体に向けた外側画面の使い方がポイント。",
+    best:"tabletop"},
+};
+
+const CATS = [
+  {id:"mail", name:"メール・メッセージ", p:"listDetail", A:"スレッド一覧", B:"会話"},
+  {id:"sns", name:"SNS・フィード", p:"feed", A:"タイムライン", B:"投稿の詳細・返信"},
+  {id:"news", name:"ニュース・ブログ", p:"feed", A:"記事一覧", B:"記事本文"},
+  {id:"book", name:"電子書籍・マンガ", p:"reader", A:"左ページ", B:"右ページ", tt:"目次・メモ"},
+  {id:"video", name:"動画・配信", p:"media", A:"動画", B:"再生操作・エピソード"},
+  {id:"music", name:"音楽・ポッドキャスト", p:"media", A:"アートワーク", B:"再生操作・キュー", kindA:"art"},
+  {id:"recipe", name:"料理・レシピ", p:"media", A:"調理手順", B:"材料・タイマー", kindA:"page"},
+  {id:"photo", name:"写真・ギャラリー", p:"grid", A:"写真グリッド", B:"選んだ写真"},
+  {id:"shop", name:"ショッピング・EC", p:"grid", A:"商品グリッド", B:"商品詳細"},
+  {id:"map", name:"地図・ナビ・旅行", p:"map", A:"地図", B:"検索結果・経路"},
+  {id:"docs", name:"メモ・ドキュメント", p:"listDetail", A:"ファイル一覧", B:"エディタ"},
+  {id:"learn", name:"学習・教育", p:"listDetail", A:"レッスン一覧", B:"レッスン"},
+  {id:"draw", name:"お絵かき・写真編集", p:"canvas", A:"キャンバス", B:"ツール・レイヤー"},
+  {id:"finance", name:"家計簿・金融", p:"dashboard", A:"推移グラフ", B:"指標カード"},
+  {id:"fitness", name:"フィットネス・ヘルス", p:"dashboard", A:"アクティビティ", B:"記録カード"},
+  {id:"camera", name:"カメラ", p:"camera", A:"ファインダー", B:"シャッター・設定"},
+  {id:"game", name:"ゲーム", p:"game", A:"ゲーム画面", B:"操作パッド・マップ"},
+];
+
+const MODS = [
+  {id:"tab", name:"タブバーがある", def:true},
+  {id:"task", name:"作業中心の画面がある(編集・入力など)"},
+  {id:"text", name:"文字入力が多い"},
+  {id:"video", name:"動画を再生する"},
+  {id:"cam", name:"カメラを使う"},
+  {id:"custom", name:"独自のツールバー・タブバーを使っている"},
+  {id:"orient", name:"画面の向きを固定している"},
+  {id:"faceid", name:"アプリ内に「Face ID」という文言がある"},
+  {id:"widget", name:"ウィジェットがまだない"},
+  {id:"ipad", name:"iPad 版があり、マルチウィンドウ対応"},
+];
+
+/* ---------- State ---------- */
+const state = {cat:"mail", mods:{tab:true}, done:{}};
+try { const s = JSON.parse(localStorage.getItem("foldplanner:v1") || "null"); if (s) Object.assign(state, s); } catch(e) {}
+const persist = () => { try { localStorage.setItem("foldplanner:v1", JSON.stringify(state)); } catch(e) {} };
+
+/* ---------- SVG helpers ---------- */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const R = (x,y,w,h,cls,rx=0) => `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(0,w).toFixed(1)}" height="${Math.max(0,h).toFixed(1)}" rx="${rx}" class="${cls}"/>`;
+const C = (cx,cy,r,cls) => `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r}" class="${cls}"/>`;
+const L = (x1,y1,x2,y2,cls="s-line") => `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="${cls}"/>`;
+
+function textLines(x, y, w, h, n, step = 22){
+  let o = ""; const rows = Math.min(n, Math.floor((h - 8) / step));
+  for (let i = 0; i < rows; i++){ const ww = w * (i % 4 === 3 ? .55 : .92); o += L(x, y + i * step + 8, x + ww, y + i * step + 8); }
+  return o;
+}
+
+function drawKind(kind, x, y, w, h, opt = {}){
+  const p = 16; let o = "";
+  switch (kind){
+    case "list": {
+      const step = 62;
+      for (let yy = y + p; yy + 44 < y + h; yy += step){
+        o += C(x + p + 18, yy + 20, 17, "s-wire");
+        o += L(x + p + 50, yy + 12, x + Math.min(w - p, p + 50 + w * .5), yy + 12);
+        o += L(x + p + 50, yy + 32, x + w - p - 6, yy + 32, "s-line");
+        if (yy + step + 44 < y + h) o += L(x + p, yy + step - 8, x + w - p, yy + step - 8, "s-line\" style=\"stroke-width:1.5");
+      }
+      break;
+    }
+    case "detail":
+      o += R(x + p, y + p, w * .55, 22, "s-wire", 5);
+      o += textLines(x + p, y + p + 50, w - 2*p, h - p - 60, 40);
+      break;
+    case "page":
+      o += R(x + p, y + p, w - 2*p, h - 2*p, "s-surface\" style=\"fill:var(--screen);stroke:var(--wire);stroke-width:2", 6);
+      o += textLines(x + p + 18, y + p + 22, w - 2*p - 36, h - 2*p - 30, 60, 20);
+      break;
+    case "feed": {
+      const cols = opt.cols || 1, gap = 14, cw = (w - 2*p - gap*(cols-1)) / cols;
+      for (let c = 0; c < cols; c++){
+        let yy = y + p + (c % 2) * 40; const xx = x + p + c * (cw + gap);
+        while (yy < y + h - 60){
+          const ih = Math.min(cw * .5, 150);
+          o += R(xx, yy, cw, ih, "s-soft", 8);
+          o += L(xx + 4, yy + ih + 16, xx + cw * .8, yy + ih + 16);
+          o += L(xx + 4, yy + ih + 36, xx + cw * .55, yy + ih + 36);
+          yy += ih + 64;
+        }
+      }
+      break;
+    }
+    case "media": {
+      o += R(x, y, w, h, "s-dark");
+      const r = Math.min(w, h) * .09;
+      o += `<path d="M${x + w/2 - r*.6},${y + h/2 - r} L${x + w/2 + r},${y + h/2} L${x + w/2 - r*.6},${y + h/2 + r} Z" class="s-white"/>`;
+      break;
+    }
+    case "art": {
+      const s = Math.min(w, h) * .7;
+      o += R(x + (w - s)/2, y + (h - s)/2, s, s, "s-accent-soft", 14);
+      o += C(x + w/2, y + h/2, s * .18, "s-accent");
+      break;
+    }
+    case "controls": {
+      const cx = x + w/2, cy = y + Math.min(h * .35, 70);
+      o += L(x + p*2, cy - 34, x + w - p*2, cy - 34, "s-line");
+      o += L(x + p*2, cy - 34, x + p*2 + (w - p*4) * .4, cy - 34, "s-accent-line");
+      o += C(cx - 70, cy + 6, 16, "s-wire") + C(cx, cy + 6, 26, "s-accent") + C(cx + 70, cy + 6, 16, "s-wire");
+      if (h > 160) o += textLines(x + p, cy + 60, w - 2*p, h - (cy - y) - 70, 8, 30);
+      break;
+    }
+    case "grid": {
+      const cols = opt.cols || 3, gap = 6, cw = (w - 2*8 - gap*(cols-1)) / cols;
+      for (let yy = y + 8; yy + cw * .6 < y + h; yy += cw + gap)
+        for (let c = 0; c < cols; c++) o += R(x + 8 + c * (cw + gap), yy, cw, Math.min(cw, y + h - yy - 4), c % 3 === 1 ? "s-wire" : "s-soft", 4);
+      break;
+    }
+    case "canvas": {
+      o += R(x + p, y + p, w - 2*p, h - 2*p, "s-soft", 6);
+      const bx = x + p, by = y + p, bw = w - 2*p, bh = h - 2*p;
+      o += `<path d="M${bx + bw*.18},${by + bh*.7} C${bx + bw*.3},${by + bh*.2} ${bx + bw*.55},${by + bh*.9} ${bx + bw*.82},${by + bh*.3}" class="s-accent-line" style="stroke-width:7"/>`;
+      break;
+    }
+    case "panel":
+      for (let yy = y + p; yy + 40 < y + h; yy += 52){
+        o += R(x + p, yy, w - 2*p, 40, "s-soft", 8);
+        o += C(x + w - p - 22, yy + 20, 10, "s-wire");
+      }
+      break;
+    case "map": {
+      o += R(x, y, w, h, "s-map");
+      o += `<path d="M${x},${y + h*.62} C${x + w*.3},${y + h*.5} ${x + w*.55},${y + h*.8} ${x + w},${y + h*.55}" class="s-road"/>`;
+      o += `<path d="M${x + w*.35},${y} C${x + w*.4},${y + h*.4} ${x + w*.3},${y + h*.7} ${x + w*.42},${y + h}" class="s-road"/>`;
+      o += `<path d="M${x + w*.72},${y + h*.18} L${x + w*.62},${y + h*.6}" class="s-accent-line" style="stroke-width:7"/>`;
+      o += C(x + w*.72, y + h*.18, 13, "s-accent");
+      break;
+    }
+    case "chart": {
+      o += R(x + p, y + p, w - 2*p, h - 2*p, "s-soft", 8);
+      const bx = x + p + 14, by = y + p + 18, bw = w - 2*p - 28, bh = h - 2*p - 36;
+      const pts = [.62,.55,.66,.42,.48,.3,.36,.2].map((v, i) => `${(bx + bw * i / 7).toFixed(1)},${(by + bh * v).toFixed(1)}`).join(" ");
+      o += `<polyline points="${pts}" class="s-accent-line" style="stroke-width:5"/>`;
+      break;
+    }
+    case "cards": {
+      const cols = 2, gap = 12, cw = (w - 2*p - gap) / cols, rows = Math.max(1, Math.min(3, Math.floor((h - p) / 110)));
+      const ch = (h - 2*p - gap*(rows-1)) / rows;
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++){
+        const xx = x + p + c * (cw + gap), yy = y + p + r * (ch + gap);
+        o += R(xx, yy, cw, ch, "s-soft", 8);
+        o += R(xx + 12, yy + ch - 34, cw * .45, 18, "s-wire", 4);
+      }
+      break;
+    }
+    case "game":
+      o += R(x, y, w, h, "s-dark");
+      o += C(x + w*.3, y + h*.62, Math.min(w,h)*.08, "s-accent");
+      o += R(x + w*.55, y + h*.35, w*.18, h*.3, "s-white\" style=\"opacity:.25", 10);
+      o += R(x + 18, y + 18, 110, 20, "s-white\" style=\"opacity:.6", 6);
+      break;
+    case "pad": {
+      o += R(x, y, w, h, "s-soft");
+      const cx = x + w * .3, cy = y + h / 2, s = Math.min(w, h) * .12;
+      o += R(cx - s*1.5, cy - s/2, s*3, s, "s-wire", 6) + R(cx - s/2, cy - s*1.5, s, s*3, "s-wire", 6);
+      o += C(x + w*.7, cy - s*.6, s*.6, "s-accent") + C(x + w*.7 + s*1.4, cy + s*.4, s*.6, "s-accent");
+      break;
+    }
+    case "viewfinder": {
+      o += R(x, y, w, h, "s-dark");
+      const s = Math.min(w, h) * .14, cx = x + w/2, cy = y + h/2;
+      o += `<path d="M${cx - s},${cy - s + 18} V${cy - s} H${cx - s + 18} M${cx + s - 18},${cy - s} H${cx + s} V${cy - s + 18} M${cx + s},${cy + s - 18} V${cy + s} H${cx + s - 18} M${cx - s + 18},${cy + s} H${cx - s} V${cy + s - 18}" stroke="#FFFFFF" stroke-width="3" fill="none" opacity=".85"/>`;
+      break;
+    }
+    case "shutter": {
+      o += R(x, y, w, h, "s-soft");
+      const cx = x + w/2, cy = y + h/2;
+      o += C(cx, cy, Math.min(34, Math.min(w, h) * .3), "s-accent");
+      if (w > h) { o += C(cx - 90, cy, 18, "s-wire") + C(cx + 90, cy, 18, "s-wire"); }
+      else { o += C(cx, cy - 90, 18, "s-wire") + C(cx, cy + 90, 18, "s-wire"); }
+      break;
+    }
+  }
+  return o;
+}
+
+function label(x, y, text){
+  const w = [...text].reduce((a, ch) => a + (ch.charCodeAt(0) > 255 ? 25 : 14), 0) + 18;
+  return R(x + 8, y + 8, w, 36, "s-labelbg", 7) + `<text x="${x + 17}" y="${y + 34}" class="s-label">${esc(text)}</text>`;
+}
+
+function chrome(pose, cr, opts){
+  let o = "";
+  const {w, h} = pose;
+  if (opts.fullBleed) return o;
+  if (pose.bars === "side"){
+    const rx = opts.railLeft ? cr.railX : w - RAIL;
+    o += R(rx, 0, RAIL, h, "s-chrome");
+    const cx = rx + RAIL / 2;
+    let y = 26;
+    if (pose.camera){ o += C(cx, y, 10, "s-dark"); y += 30; }
+    o += R(cx - 13, y, 26, 8, "s-wire", 4); y += 44;
+    for (let i = 0; i < 3; i++){ o += C(cx, y + i * 46, 13, i === 0 ? "s-accent" : "s-wire"); }
+    if (opts.tab){
+      const n = 4, top = h - 30 - n * 50;
+      o += R(rx + 6, top - 8, RAIL - 12, n * 50 + 8, "s-soft", 22);
+      for (let i = 0; i < n; i++) o += C(cx, top + 18 + i * 50, 11, i === 0 ? "s-accent" : "s-wire");
+    }
+  } else {
+    o += R(0, 0, w, 66, "s-chrome");
+    o += R(18, 8, 40, 9, "s-wire", 4) + R(w - 70, 8, 52, 9, "s-wire", 4);
+    o += `<path d="M30,33 l-10,10 l10,10" stroke="var(--accent)" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+    o += R(w/2 - 70, 36, 140, 14, "s-wire", 7);
+    o += C(w - 36, 43, 12, "s-accent") + C(w - 76, 43, 12, "s-wire");
+    if (opts.tab){
+      o += R(0, h - 62, w, 62, "s-chrome");
+      for (let i = 0; i < 4; i++) o += C(w * (i + .5) / 4, h - 31, 11, i === 0 ? "s-accent" : "s-wire");
+    }
+  }
+  return o;
+}
+
+function contentRect(pose, opts){
+  if (opts.fullBleed) return {x:0, y:0, w:pose.w, h:pose.h};
+  if (pose.bars === "side") return {x:0, y:0, w:pose.w - RAIL, h:pose.h};
+  const bottom = opts.tab ? 62 : 0;
+  return {x:0, y:66, w:pose.w, h:pose.h - 66 - bottom};
+}
+
+function poseSVG(pose, cat, mods){
+  const P = PATTERNS[cat.p], spec = P[pose.id];
+  const kindA = cat.kindA || P.kinds[0], kindB = P.kinds[1];
+  const labA = cat.A, labB = pose.id === "tabletop" && cat.tt ? cat.tt : cat.B;
+  const opts = {tab: !!mods.tab && !P.fullBleed, fullBleed: !!P.fullBleed};
+  const W = pose.w, H = pose.h;
+  let body = "", over = "";
+  let cr;
+  // Split View: my app on the left half, controls along its outer (left) edge
+  if (pose.split){
+    const half = W / 2 - 5;
+    body += R(W/2 + 5, 0, W/2 - 5, H, "s-other");
+    body += `<text x="${W*.75}" y="${H/2}" text-anchor="middle" class="s-tiny">もう 1 つのアプリ</text>`;
+    body += R(W/2 - 2, H/2 - 40, 4, 80, "s-wire", 2);
+    cr = {x:RAIL, y:0, w:half - RAIL, h:H};
+    over += chrome({...pose, w:half}, {railX:0}, {...opts, railLeft:true});
+  } else {
+    cr = contentRect(pose, opts);
+    over += chrome(pose, cr, opts);
+  }
+  const A = (x,y,w,h,extra={}) => drawKind(kindA, x, y, w, h, {cols: spec.cols, ...extra}) + label(x, y, labA);
+  const B = (x,y,w,h) => drawKind(kindB, x, y, w, h, {cols: spec.cols}) + label(x, y, labB);
+  const {x, y, w, h} = cr;
+  const gap = 0;
+  switch (spec.arr){
+    case "single": body += A(x, y, w, h); break;
+    case "side": { const aw = w * spec.r; body += A(x, y, aw, h) + R(x + aw, y, 2, h, "s-wire") + B(x + aw + 2, y, w - aw - 2, h); break; }
+    case "stack": {
+      const ah = spec.r === "16:9" ? Math.min(h * .6, w * 9 / 16) : h * spec.r;
+      body += A(x, y, w, ah) + B(x, y + ah, w, h - ah); break;
+    }
+    case "letterbox": {
+      const mh = w * 9 / 16, top = y + (h - mh) / 2;
+      body += R(x, y, w, h, "s-dark");
+      body += drawKind(kindA, x, top, w, mh) + label(x, top, labA);
+      body += `<text x="${x + w/2}" y="${y + (top - y)/2 + 6}" text-anchor="middle" class="s-tiny" style="fill:#AEB6CC">上下に ${Math.round(top - y)}pt ずつ余白 → 字幕・チャプター</text>`;
+      body += R(x + 24, top + mh + 14, w - 48, Math.max(0, y + h - top - mh - 28), "s-white\" style=\"opacity:.12", 10);
+      body += `<text x="${x + w/2}" y="${top + mh + (y + h - top - mh)/2 + 6}" text-anchor="middle" class="s-tiny" style="fill:#AEB6CC">${esc(labB)}</text>`;
+      break;
+    }
+    case "overlay": {
+      body += drawKind(kindA, x, y, w, h, {cols: spec.cols});
+      { const lw = [...labA].reduce((a, ch) => a + (ch.charCodeAt(0) > 255 ? 25 : 14), 0) + 34; body += label(x + w - lw, y, labA); }
+      if (W > H && !pose.split){ const pw = w * .36; body += R(x + 18, y + 18, pw, h - 36, "s-labelbg", 16) + B(x + 18, y + 18, pw, h - 36); }
+      else { const sh = h * .38; body += R(x, y + h - sh, w, sh, "s-labelbg", 18) + R(x + w/2 - 24, y + h - sh + 8, 48, 6, "s-wire", 3) + B(x, y + h - sh + 10, w, sh - 10); }
+      break;
+    }
+    case "fold": {
+      const swap = !!spec.swap;
+      if (pose.fold === "v"){
+        const f = W / 2;
+        const left = [x, y, f - FOLD/2 - x, h], right = [f + FOLD/2, y, x + w - (f + FOLD/2), h];
+        body += swap ? B(...left) + A(...right) : A(...left) + B(...right);
+      } else {
+        const f = H / 2;
+        const top = [x, y, w, f - FOLD/2 - y], bot = [x, f + FOLD/2, w, y + h - (f + FOLD/2)];
+        body += swap ? B(...top) + A(...bot) : A(...top) + B(...bot);
+      }
+      break;
+    }
+  }
+  // fold band on top
+  let fold = "";
+  if (pose.fold === "v"){
+    fold += R(W/2 - FOLD/2, 0, FOLD, H, "s-fold") + L(W/2, 0, W/2, H, "s-foldline");
+    fold += `<text transform="translate(${W/2 + 6},${H/2 + 30}) rotate(-90)" class="s-foldtxt">折り目</text>`;
+  } else if (pose.fold === "h"){
+    fold += R(0, H/2 - FOLD/2, W, FOLD, "s-fold") + L(0, H/2, W, H/2, "s-foldline");
+    fold += `<text x="${W/2 - 26}" y="${H/2 + 6}" class="s-foldtxt">折り目</text>`;
+  }
+  const id = "clip-" + pose.id;
+  return `<svg viewBox="-4 -4 ${W + 8} ${H + 8}" role="img" aria-label="${esc(pose.name)}のレイアウト図">
+    <defs><clipPath id="${id}"><rect x="0" y="0" width="${W}" height="${H}" rx="30"/></clipPath></defs>
+    <rect x="0" y="0" width="${W}" height="${H}" rx="30" style="fill:var(--screen)"/>
+    <g clip-path="url(#${id})">${body}${over}${fold}</g>
+    <rect x="0" y="0" width="${W}" height="${H}" rx="30" class="s-frame" style="fill:none"/>
+  </svg>`;
+}
+
+/* ---------- Advice ---------- */
+function summaryItems(cat, mods){
+  const P = PATTERNS[cat.p], items = [];
+  items.push({t:"レイアウトの軸", d:P.headline});
+  items.push({t:"サイズクラスだけで分岐する", d:"外側は幅 Compact、内側は縦横とも Regular。画面サイズ・機種・向きで分岐するコードは、内側ディスプレイで想定外の表示になります。"});
+  if (mods.custom) items.push({t:"独自バーは縦に移動しない", d:"標準のツールバー・タブバーなら外側や横向きで自動的に右端へ縦配置されます。独自実装のバーは置き換えを検討してください。"});
+  else if (cat.p === "game") items.push({t:"黒帯を出さない", d:"Apple はレターボックスより表示範囲の変更を推奨。避けられないなら余白にアートワークを置きます。"});
+  else if (cat.p === "camera" || mods.cam) items.push({t:"外側の画面を被写体に向ける", d:"CameraCaptureAccessory を使うと、内側でアプリを操作しながら外側に被写体用の表示を出せます。"});
+  else if (["grid","dashboard","reader"].includes(cat.p)) items.push({t:"折り目の上に物を置かない", d:"半開きでは中央が予約領域になります。偶数列にして、中央をまたぐ要素は ReservedRegion API でずらします。"});
+  else items.push({t:"ツールバーは右端に縦に並ぶ", d:"外側と内側の横向きでは、ツールバー・タブバーが右端へ縦に移動します。項目にはタイトルと SF Symbols の両方を設定し、よく使うものに表示優先度を付けます。"});
+  return items;
+}
+
+function checklist(cat, mods){
+  const P = cat.p, G = [];
+  const g = (title, items) => G.push({title, items: items.filter(Boolean)});
+  g("ビルドとレイアウトの基本", [
+    {id:"sdk", t:"Xcode 27.1(iOS 27.1 SDK)でビルドする", d:"古い SDK のままだとステータスバーやカメラの下まで表示されず、画面の端まで使えません。"},
+    {id:"fullscreen", t:"Info.plist から UIRequiresFullScreen を外す", d:"iOS 27 SDK ではリサイズを止められません。開閉や Split View でサイズが変わる前提で作ります。"},
+    {id:"sizeclass", t:"画面サイズ・機種・向きではなくサイズクラスで分岐する", d:"内側ディスプレイは「対応する向き」の設定を無視します。horizontalSizeClass を見て組み立てます。"},
+    {id:"mainscreen", t:"UIScreen.main を参照しない", d:"画面が 2 つあるため、必要なら window scene から取得します。"},
+    {id:"insets", t:"左右の余白が非対称になる前提でセーフエリアを使う", d:"縦配置のバーは leading / trailing のインセットになります。左右が同じと仮定しないこと。"},
+    {id:"devicehub", t:"Device Hub の iPhone Duo シミュレーターで 6 つのポーズを確認する", d:"開く・閉じる・回転・折りたたみの操作ボタンがあります(Xcode 27.1)。"},
+  ]);
+  g("ツールバーとタブバー", [
+    mods.custom && {id:"custombar", t:"独自のバーを標準コンポーネントに置き換える", d:"標準のツールバー・タブバーなら縦配置が自動で行われます。"},
+    {id:"label", t:"ツールバー項目にタイトルと SF Symbols の両方を設定する", d:"SwiftUI は Label、UIKit は UIBarButtonItem。文字だけのボタンは横のバーに残るので最小限に。"},
+    {id:"priority", t:"よく使う項目に表示優先度を付ける", d:"<code>ToolbarItemVisibilityPriority</code> / <code>UIBarButtonItemVisibilityPriority</code>。既定では下から順にオーバーフローします。"},
+    {id:"order", t:"縦の並びは上から「戻る・閉じる」→「完了」などの主要操作", d:"項目は元のグループのまま。間隔は ToolbarItemGroup に任せ、固定スペースを入れない。"},
+    {id:"overflow", t:"独自の「…」メニューはシステムのオーバーフローメニューに統合する", d:"<code>ToolbarOverflowMenu</code> / <code>additionalOverflowItems</code>。"},
+    mods.tab && {id:"compress", t: mods.task ? "作業中心の画面ではタブバーを最小化してツールバーを残す" : "スペース不足時はツールバー項目をオーバーフローさせ、タブバーを残す(既定)", d:"<code>ToolbarVerticalCompressionBehavior</code> / <code>UIVerticalBarCompressionBehavior</code> で切り替えます。"},
+  ]);
+  const pat = {
+    listDetail:[{id:"splitview", t:"一覧と詳細は NavigationSplitView / UISplitViewController で組む", d:"外側では 1 カラムに折りたたまれ、内側で展開し、半開きでは折り目に合わせて幅が自動調整されます。"}],
+    feed:[{id:"measure", t:"本文の行長を読みやすい幅に制限する", d:"広い画面では 1 カラムを引き伸ばさず、詳細を横に出すか列を増やします。"},
+          {id:"feedsplit", t:"一覧と詳細の 2 ペインは NavigationSplitView で組む", d:"折り目への対応が自動で入ります。"}],
+    media:[{id:"overlay", t:"メディアと操作を ArrangementView(overlay)で配置する", d:"全開では重ね、半開きでは左右・上下に分かれます。UIKit は UIArrangementViewController。"},
+           {id:"letterbox", t:"内側・横の 16:9 で出る上下の余白に情報を置く", d:"全幅 951pt なら映像の高さは 535pt で、上下に計約 134pt が余ります。右端に縦のバーを出すと余白はさらに増えます。"},
+           {id:"tabletop", t:"テーブルトップ(上で視聴・下で操作)を確認する", d:"机に置いて使うのが Duo の代表的な使い方です。"}],
+    grid:[{id:"even", t:"グリッドの列数を偶数にする", d:"内側・横 6 列、縦 4 列が目安。半開きで中央に切れ目が来ても割り切れます。"},
+          {id:"cell", t:"セルの物理サイズをポーズ間でそろえる", d:"列数を増やして調整し、セルを大きく引き伸ばさない。"}],
+    canvas:[{id:"arrsplit", t:"作業面とパネルを ArrangementView(split)で配置する", d:"幅が広いと左右、縦長だと上下に自動で分割されます。"},
+            {id:"palette", t:"テーブルトップでは道具を下半分に", d:"上半分は作品、下半分はパレットやキーボード。"}],
+    map:[{id:"sheet", t:"情報パネルはシートかオーバーレイ配置で出す", d:"シートは折り目を避けて自動で動きます。"},
+         {id:"mapfold", t:"半開きでは地図と情報を左右(上下)に分ける", d:"地図の注目点が折り目に来ないようにします。"}],
+    dashboard:[{id:"cardseven", t:"指標カードは偶数列で並べる", d:"2 列 × n 行が外側・内側の両方で崩れにくい構成です。"},
+               {id:"chartfold", t:"グラフを折り目でまたがせない", d:"ReservedRegion API で片側に寄せます。"}],
+    reader:[{id:"spread", t:"見開き表示の境目を画面の中心に合わせる", d:"開いていても半開きでも、ページの境目が折り目と一致します。"},
+            {id:"onepage", t:"1 ページを折り目にまたがせない", d:"内側・縦では 1 ページ表示に切り替えます。"}],
+    game:[{id:"fill", t:"どのポーズでも画面を埋める", d:"向きを固定していても、開閉でサイズが変わります。表示範囲(アスペクト比)を変えて対応します。"},
+          {id:"padding", t:"どうしても余白が出るならアートワークを置く", d:"黒帯は「全画面ではない」印象になります。"},
+          {id:"hud", t:"文字とボタンの大きさをポーズ間でそろえる", d:"HUD は折り目と外側のカメラ位置を避けます。"}],
+    camera:[{id:"vfc", t:"Virtual Front Camera を使う", d:"開くと内側、閉じると外側の前面カメラに自動で切り替わる AVCaptureDevice です。"},
+            {id:"accessory", t:"CameraCaptureAccessory で外側に被写体用 UI を出す", d:"内側で全画面かつカメラセッション中に使えます。撮られる人に表示を見せられます。"}],
+  };
+  g("このアプリのレイアウト", [
+    ...pat[P],
+    {id:"fold", t:"自作コンポーネントは ReservedRegion API で折り目を避ける", d:"アラート・メニュー・シート・分割ビューは自動で避けます。<code>ReservedRegion</code>(SwiftUI / UIKit)。"},
+    {id:"subtle", t:"折りたたむときのレイアウト変化を最小限にする", d:"見えて押せる状態を保つのに必要な分だけ動かします。"},
+  ]);
+  g("機能ごとの対応", [
+    mods.text && {id:"textfold", t:"入力欄を折り目にかけない", d:"テーブルトップでは下半分がキーボードになりやすいので、入力中の欄は上半分に来るようにします。"},
+    mods.video && P !== "media" && {id:"videott", t:"動画はテーブルトップで上半分に表示されるか確認する", d:"ArrangementView(overlay)で重ねる構成にすると自動で上下に分かれます。"},
+    mods.cam && P !== "camera" && {id:"camacc", t:"カメラ利用画面で Virtual Front Camera と CameraCaptureAccessory を確認する", d:"内外のカメラ切り替えと、外側画面の活用。"},
+    mods.orient && {id:"orientlock", t:"向きの固定に頼らないレイアウトにする", d:"内側では対応する向きが無視され、Split View では縮小表示されます。"},
+    mods.faceid && {id:"touchid", t:"「Face ID」の文言を LAContext.biometryType で切り替える", d:"iPhone Duo は Touch ID です。<code>.touchID</code> のときの文言とアイコンを用意します。"},
+    mods.widget && {id:"widgetstandby", t:"ウィジェットかライブアクティビティを用意する", d:"Duo は充電中でなくても両画面で StandBy を使えます。机に置いた状態で常に見える場所です。"},
+    mods.ipad && {id:"scenes", t:"マルチウィンドウが Duo でも有効になることを確認する", d:"外側では新しいウィンドウを作れないため、シーンのリクエスト失敗を処理します。"},
+    !mods.ipad && {id:"scenes2", t:"Split View で幅が半分になったときの表示を確認する", d:"2 つのアプリで内側を分け合うと、自分のアプリは Compact 幅になります。"},
+  ]);
+  g("App Store 提出", [
+    {id:"shots", t:"iPhone Duo 用のスクリーンショットを用意する", d:"外側 1398×2034、内側 2007×2853(横向きも可)。2027 年 4 月以降の提出で必須になります。<!--repo-only--> <a href=\"/asset-press\">Asset Press</a> で作れます。<!--/repo-only-->"},
+    {id:"inuse", t:"スクリーンショットの過半数をアプリ使用中の画面にする", d:"4 枚なら 3 枚が使用中の画面であること(ガイドライン 2.3.3)。"},
+  ]);
+  return G;
+}
+
+/* ---------- Render ---------- */
+function render(){
+  const cat = CATS.find(c => c.id === state.cat) || CATS[0];
+  const P = PATTERNS[cat.p];
+  // summary
+  const sum = $("summary"); sum.textContent = "";
+  for (const it of summaryItems(cat, state.mods)){
+    const li = document.createElement("li"); const b = document.createElement("b"); b.textContent = it.t;
+    li.appendChild(b); li.appendChild(document.createTextNode(it.d)); sum.appendChild(li);
+  }
+  const bestPose = POSES.find(p => p.id === P.best);
+  $("best").innerHTML = `<strong>見せ場のポーズ:${esc(bestPose.name)}</strong> ― ${esc(P[P.best].note)}`;
+  $("sumTitle").textContent = `${cat.name}アプリで、まず押さえる 3 点`;
+  // poses
+  const host = $("poses"); host.textContent = "";
+  for (const pose of POSES){
+    const fig = document.createElement("figure"); fig.className = "pose" + (pose.id === P.best ? " best" : "");
+    fig.style.margin = "0"; fig.style.width = `${Math.round(pose.w * SCALE)}px`;
+    fig.innerHTML = poseSVG(pose, cat, state.mods) +
+      `<figcaption><span class="pn">${esc(pose.name)}</span><span class="ps">${esc(pose.spec)}</span><span class="pnote">${esc(P[pose.id].note)}</span></figcaption>`;
+    host.appendChild(fig);
+  }
+  // checklist
+  const gh = $("groups"); gh.textContent = "";
+  for (const grp of checklist(cat, state.mods)){
+    const sec = document.createElement("div"); sec.className = "group box";
+    sec.innerHTML = `<h3>${esc(grp.title)}</h3><ul>${grp.items.map(it => `<li><label><input type="checkbox" data-id="${it.id}" ${state.done[it.id] ? "checked" : ""}><span><span class="t">${esc(it.t)}</span><span class="d">${it.d}</span></span></label></li>`).join("")}</ul>`;
+    gh.appendChild(sec);
+  }
+}
+
+function buildInputs(){
+  const cats = $("cats");
+  for (const c of CATS){
+    const l = document.createElement("label"); l.className = "chip";
+    l.innerHTML = `<input type="radio" name="cat" value="${c.id}"><span></span>`;
+    l.lastChild.textContent = c.name; l.firstChild.checked = c.id === state.cat;
+    cats.appendChild(l);
+  }
+  const mods = $("mods");
+  for (const m of MODS){
+    if (!(m.id in state.mods) && m.def) state.mods[m.id] = true;
+    const l = document.createElement("label");
+    l.innerHTML = `<input type="checkbox" value="${m.id}"><span></span>`;
+    l.lastChild.textContent = m.name; l.firstChild.checked = !!state.mods[m.id];
+    mods.appendChild(l);
+  }
+  cats.addEventListener("change", e => { state.cat = e.target.value; persist(); render(); });
+  mods.addEventListener("change", e => { state.mods[e.target.value] = e.target.checked; persist(); render(); });
+  $("groups").addEventListener("change", e => { const id = e.target.dataset.id; if (id){ state.done[id] = e.target.checked; persist(); } });
+}
+
+/* ---------- Markdown export ---------- */
+function toMarkdown(){
+  const cat = CATS.find(c => c.id === state.cat) || CATS[0], P = PATTERNS[cat.p];
+  const strip = s => s.replace(/<!--repo-only-->[\s\S]*?<!--\/repo-only-->/g, "").replace(/<code>(.*?)<\/code>/g, "`$1`").replace(/<[^>]+>/g, "");
+  let md = `# iPhone Duo 対応メモ(${cat.name})\n\n`;
+  md += `## 方針\n\n`;
+  summaryItems(cat, state.mods).forEach((it, i) => md += `${i + 1}. **${it.t}** ${it.d}\n`);
+  md += `\n## ポーズ別レイアウト\n\n| ポーズ | サイズ | レイアウト |\n|---|---|---|\n`;
+  for (const p of POSES) md += `| ${p.name}${p.id === P.best ? "(おすすめ)" : ""} | ${p.spec} | ${P[p.id].note} |\n`;
+  md += `\n## チェックリスト\n`;
+  for (const g of checklist(cat, state.mods)){
+    md += `\n### ${g.title}\n\n`;
+    for (const it of g.items) md += `- [${state.done[it.id] ? "x" : " "}] ${it.t}  \n  ${strip(it.d)}\n`;
+  }
+  md += `\n---\n参考: Apple Human Interface Guidelines「Designing for iPhone Duo」。Fold Planner で作成。\n`;
+  return md;
+}
+async function saveFile(name, data){
+  if (window.claude && typeof window.claude.use === "function"){
+    try { const dl = await window.claude.use("downloads"); if (dl){ await dl.save({filename:name, data}); return true; } }
+    catch(e){ return false; }
+  }
+  const url = URL.createObjectURL(new Blob([data], {type:"text/markdown"})), a = document.createElement("a");
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000); return true;
+}
+$("copyMd").addEventListener("click", () => {
+  const md = toMarkdown(), st = $("status");
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(md).then(() => st.textContent = "Markdown をコピーしました。", () => st.textContent = "コピーできませんでした。「.md で保存」を使ってください。");
+  } else st.textContent = "このブラウザではコピーできません。「.md で保存」を使ってください。";
+});
+$("saveMd").addEventListener("click", async () => {
+  const ok = await saveFile(`iphone-duo-plan-${state.cat}.md`, toMarkdown());
+  $("status").textContent = ok ? "保存しました。" : "保存をキャンセルしました。";
+});
+
+buildInputs(); render();
+})();
+</script>
+</body>
+</html>

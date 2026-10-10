@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Asset Press</title>
+<meta name="description" content="App Storeの新しいプロダクトページヘッダー・検索結果アセット・iPhone Duoスクリーンショットを、規定サイズのアルファなしPNGで書き出す無料ツール。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+JP:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=M+PLUS+Rounded+1c:wght@500;800&family=Noto+Serif+JP:wght@500;700&family=Dela+Gothic+One&display=swap">
+<style>
+/* Layout: working stage on the left (live canvas at true aspect), a narrow control column on the right; stacks on phones. */
+:root{
+  --paper:#F3F5F9; --surface:#FFFFFF; --ink:#161C2E; --ink-2:#5A6379; --rule:#D5DAE5;
+  --accent:#3246C6; --accent-ink:#FFFFFF; --fold:#D98A1C;
+  --ok:#1E7A4C; --warn:#A6570A; --info:#3246C6;
+  --stage:#E4E8F0;
+  --f-display:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0F121B; --surface:#171B27; --ink:#E6E9F2; --ink-2:#9AA3B8; --rule:#2A3043;
+  --accent:#8C98FF; --accent-ink:#0F121B; --fold:#F0B357;
+  --ok:#5BD08F; --warn:#F2A85A; --info:#8C98FF; --stage:#0A0D14; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0F121B; --surface:#171B27; --ink:#E6E9F2; --ink-2:#9AA3B8; --rule:#2A3043;
+  --accent:#8C98FF; --accent-ink:#0F121B; --fold:#F0B357;
+  --ok:#5BD08F; --warn:#F2A85A; --info:#8C98FF; --stage:#0A0D14; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.6;padding-inline:20px;padding-block:0 40px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;padding-block:20px 16px;border-bottom:1px solid var(--rule);margin-bottom:20px}
+.brand{font-family:var(--f-display);font-weight:900;font-size:22px;letter-spacing:.01em;margin:0}
+.brand small{font-weight:500;font-size:13px;color:var(--ink-2);margin-left:10px;letter-spacing:0}
+.top nav{margin-left:auto;display:flex;gap:16px;font-size:13px}
+
+.app{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:start}
+@media (max-width:900px){.app{grid-template-columns:minmax(0,1fr)}}
+
+.stage{position:sticky;top:12px;display:grid;gap:12px;min-width:0}
+@media (max-width:900px){.stage{position:static}}
+.canvas-wrap{background:var(--stage);border-radius:10px;padding:18px;display:grid;place-items:center;min-height:200px}
+#preview{display:block;max-width:100%;height:auto;box-shadow:0 1px 0 rgba(0,0,0,.08),0 8px 30px rgba(10,20,60,.18)}
+.drop-hint{font-size:12px;color:var(--ink-2)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:13px;color:var(--ink-2)}
+.meta .dim{font-family:var(--f-data);color:var(--ink);font-size:13px}
+.meta label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+
+.checks{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:14px 16px}
+.checks h2,.panel h2{font-family:var(--f-display);font-weight:700;font-size:15px;margin:0 0 8px}
+.checks ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.checks li{display:grid;grid-template-columns:22px 1fr;gap:6px;font-size:13px;line-height:1.55}
+.checks li::before{font-weight:700;text-align:center;border-radius:50%;width:18px;height:18px;line-height:18px;font-size:11px;margin-top:1px}
+.checks li.ok::before{content:"✓";color:var(--ok);border:1.5px solid var(--ok)}
+.checks li.warn::before{content:"!";color:var(--warn);border:1.5px solid var(--warn)}
+.checks li.info::before{content:"i";color:var(--info);border:1.5px solid var(--info)}
+
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:10px;display:grid}
+.panel section{padding:16px;border-bottom:1px solid var(--rule);display:grid;gap:10px}
+.panel section:last-child{border-bottom:0}
+.field{display:grid;gap:4px}
+.field > span,.lbl{font-size:12px;color:var(--ink-2);font-weight:500}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+input[type=text],textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:7px 9px}
+textarea{resize:vertical;min-height:58px;line-height:1.5}
+input[type=color]{width:100%;height:34px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);padding:2px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=file]{font-size:12px;max-width:100%}
+
+.presets{display:grid;gap:12px}
+.pgroup{display:grid;gap:4px}
+.pgroup > .lbl{margin-bottom:2px}
+.preset{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;cursor:pointer;font-size:13px;background:var(--paper)}
+.preset input{accent-color:var(--accent);margin:0}
+.preset .px{font-family:var(--f-data);font-size:11.5px;color:var(--ink-2)}
+.preset:has(input:checked){border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+
+.seg{display:flex;border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.seg label{flex:1;text-align:center;font-size:12.5px;padding:6px 4px;cursor:pointer;background:var(--paper);border-right:1px solid var(--rule)}
+.seg label:last-child{border-right:0}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label:has(input:checked){background:var(--accent);color:var(--accent-ink)}
+.seg label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:-2px}
+
+.btn{font:inherit;font-weight:600;font-size:13.5px;border-radius:7px;padding:9px 12px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.small{font-size:12px;padding:5px 9px;font-weight:500}
+.btn:disabled{opacity:.5;cursor:progress}
+.export{display:grid;gap:8px}
+.status{font-size:12.5px;color:var(--ink-2);min-height:1.4em}
+.filebox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+.specs{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:14px 16px}
+.specs h2{font-family:var(--f-display);font-weight:700;font-size:15px;margin:0 0 8px}
+.table-scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{text-align:left;padding:6px 10px 6px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:600;color:var(--ink-2);font-size:12px}
+td.px{font-family:var(--f-data);white-space:nowrap;font-variant-numeric:tabular-nums}
+footer{margin-top:28px;font-size:12px;color:var(--ink-2);display:grid;gap:4px;max-width:80ch}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1 class="brand">Asset Press<small>App Storeクリエイティブ素材メーカー</small></h1>
+  <nav><!--repo-only--><a href="/">Unfold Kit</a><a href="/fold-planner">Fold Planner</a><!--/repo-only--><a href="#specs">サイズ一覧</a></nav>
+</header>
+
+<main class="app">
+  <div class="stage">
+    <div class="canvas-wrap" id="dropzone"><canvas id="preview" width="1200" height="514" aria-label="書き出し画像のプレビュー"></canvas></div>
+    <div class="meta">
+      <span class="dim" id="dimLabel">3840 × 1646 px</span>
+      <span id="ratioLabel">21:9</span>
+      <label id="safeToggleWrap"><input type="checkbox" id="showSafe" checked> セーフエリアを表示</label>
+      <span class="drop-hint" id="dropHint">画像をプレビューにドラッグすると背景になります</span>
+    </div>
+    <div class="checks" aria-live="polite">
+      <h2>提出前チェック</h2>
+      <ul id="checks"></ul>
+    </div>
+  </div>
+
+  <form class="panel" id="panel" autocomplete="off">
+    <section>
+      <h2>書き出すもの</h2>
+      <div class="presets" id="presets"></div>
+    </section>
+
+    <section>
+      <h2>テキスト</h2>
+      <label class="field"><span>見出し(改行できます)</span><textarea id="title" rows="2"></textarea></label>
+      <label class="field"><span>サブテキスト</span><input type="text" id="sub"></label>
+      <div class="row">
+        <label class="field"><span>書体</span>
+          <select id="font">
+            <option value="zen">ゴシック(Zen Kaku)</option>
+            <option value="rounded">丸ゴシック(M PLUS Rounded)</option>
+            <option value="serif">明朝(Noto Serif)</option>
+            <option value="dela">太字ディスプレイ(Dela Gothic)</option>
+          </select></label>
+        <label class="field"><span>文字色</span><input type="color" id="textColor"></label>
+      </div>
+      <label class="field"><span>文字の大きさ</span><input type="range" id="titleScale" min="0.5" max="1.6" step="0.02"></label>
+      <div class="field"><span class="lbl">揃え</span>
+        <div class="seg" role="radiogroup" aria-label="揃え">
+          <label><input type="radio" name="align" value="center">中央</label>
+          <label><input type="radio" name="align" value="left">左</label>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>背景</h2>
+      <div class="seg" role="radiogroup" aria-label="背景の種類">
+        <label><input type="radio" name="bgMode" value="solid">単色</label>
+        <label><input type="radio" name="bgMode" value="gradient">グラデーション</label>
+        <label><input type="radio" name="bgMode" value="image">画像</label>
+      </div>
+      <div class="row">
+        <label class="field"><span>色 1</span><input type="color" id="c1"></label>
+        <label class="field" id="c2wrap"><span>色 2</span><input type="color" id="c2"></label>
+      </div>
+      <label class="field" id="angleWrap"><span>グラデーションの角度</span><input type="range" id="angle" min="0" max="360" step="5"></label>
+      <div id="imgControls" class="field" hidden>
+        <div class="filebox"><input type="file" id="bgFile" accept="image/*"></div>
+        <label class="field"><span>拡大</span><input type="range" id="imgScale" min="1" max="3" step="0.02"></label>
+        <div class="row">
+          <label class="field"><span>横位置</span><input type="range" id="imgX" min="0" max="1" step="0.01"></label>
+          <label class="field"><span>縦位置</span><input type="range" id="imgY" min="0" max="1" step="0.01"></label>
+        </div>
+      </div>
+      <label class="field"><span>暗くする(文字を読みやすく)</span><input type="range" id="dim" min="0" max="0.7" step="0.01"></label>
+    </section>
+
+    <section>
+      <h2>画像</h2>
+      <div class="field"><span class="lbl">アプリアイコン(任意)</span>
+        <div class="filebox"><input type="file" id="iconFile" accept="image/*"><button type="button" class="btn ghost small" id="iconClear" hidden>外す</button></div>
+      </div>
+      <div class="field" id="iconLayoutWrap"><span class="lbl">アイコンの位置</span>
+        <div class="seg" role="radiogroup" aria-label="アイコンの位置">
+          <label><input type="radio" name="iconLayout" value="stack">文字の上</label>
+          <label><input type="radio" name="iconLayout" value="inline">文字の横</label>
+        </div>
+      </div>
+      <div class="field" id="shotWrap"><span class="lbl">アプリの画面(スクリーンショット用)</span>
+        <div class="filebox"><input type="file" id="shotFile" accept="image/*"><button type="button" class="btn ghost small" id="shotClear" hidden>外す</button></div>
+        <span class="drop-hint">Xcode 27.1 の iPhone Duo シミュレーターで撮った画面を入れてください。</span>
+      </div>
+    </section>
+
+    <section class="export">
+      <h2>書き出し</h2>
+      <div class="row">
+        <button type="button" class="btn" id="exportPng">PNG(アルファなし)</button>
+        <button type="button" class="btn ghost" id="exportJpg">JPEG</button>
+      </div>
+      <button type="button" class="btn ghost" id="exportTrio">ヘッダー・検索・ユニバーサルを一括書き出し</button>
+      <div class="status" id="status" role="status"></div>
+    </section>
+  </form>
+</main>
+
+<section class="specs" id="specs" style="margin-top:24px">
+  <h2>サイズ一覧</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th>用途</th><th>サイズ(px)</th><th>比率</th><th>メモ</th></tr></thead>
+    <tbody id="specRows"></tbody>
+  </table></div>
+</section>
+
+<footer>
+  <p>画像の処理はすべてこのブラウザの中で行われます。アップロードした画像がサーバーに送られることはありません。</p>
+  <p>セーフエリアは Apple 公式の Sketch テンプレートに描かれた「ART SAFE AREA」を実測した値です。Apple はピクセル単位のセーフエリアを公表していないため、最終確認は App Store Connect のプレビューツールで行ってください。</p>
+  <p>出典: <a href="https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications" target="_blank" rel="noopener">Screenshot specifications</a> / <a href="https://developer.apple.com/app-store/" target="_blank" rel="noopener">App Store asset best practices</a> / <a href="https://blakecrosley.com/blog/app-store-product-page-marketing-2026" target="_blank" rel="noopener">The 2026 App Store Product Page (Blake Crosley)</a></p>
+  <p>Apple、App Store、iPhone は Apple Inc. の商標です。このツールは Apple とは関係のない非公式ツールです。</p>
+</footer>
+
+<script>
+(() => {
+"use strict";
+
+/* ---------- Specs ---------- */
+const PRESETS = [
+  {id:"header", group:"creative", name:"プロダクトページヘッダー", w:3840, h:1646, ratio:"21:9", safe:[1097,493,1646,661], formats:["png","jpg"],
+   note:"ページ最上部に表示。API は PNG のみ受け付けるため PNG 推奨。動画なら 5〜30 秒。"},
+  {id:"search", group:"creative", name:"検索結果アセット", w:3840, h:2560, ratio:"3:2", safe:[836,765,2168,1030], formats:["png","jpg"],
+   note:"検索結果でスクリーンショットの代わりに表示。1920×1280〜3840×2560 の範囲で可。"},
+  {id:"universal", group:"creative", name:"ユニバーサル", w:5244, h:2950, ratio:"16:9", safe:[1921,660,1402,962], formats:["png"],
+   note:"1 枚でヘッダーと検索結果の両方に使える。PNG のみ。"},
+  {id:"eventCard", group:"event", name:"イベントカード", w:1920, h:1080, ratio:"16:9", formats:["png","jpg"],
+   note:"App内イベントのカード。1920×1080〜3840×2160。"},
+  {id:"eventDetail", group:"event", name:"イベント詳細", w:1080, h:1920, ratio:"9:16", formats:["png","jpg"],
+   note:"App内イベントの詳細ページ。1080×1920〜2160×3840。"},
+  {id:"duoOuterP", group:"duo", name:"外側・縦", w:1398, h:2034, ratio:"約 2:3", formats:["png","jpg"],
+   note:"iPhone Duo 外側ディスプレイ。2027年4月以降の提出で必須。"},
+  {id:"duoOuterL", group:"duo", name:"外側・横", w:2034, h:1398, ratio:"約 3:2", formats:["png","jpg"], note:"外側ディスプレイの横向き。"},
+  {id:"duoInnerL", group:"duo", name:"内側・横", w:2853, h:2007, ratio:"約 √2:1", formats:["png","jpg"], note:"内側 7.6 インチ。開いたときの自然な向き。"},
+  {id:"duoInnerP", group:"duo", name:"内側・縦", w:2007, h:2853, ratio:"約 1:√2", formats:["png","jpg"], note:"内側ディスプレイの縦向き。"},
+];
+const GROUPS = {creative:"クリエイティブアセット(iOS 27〜)", event:"App内イベント", duo:"iPhone Duo スクリーンショット"};
+const FONTS = {
+  zen:{fam:'"Zen Kaku Gothic New"', t:900, s:500},
+  rounded:{fam:'"M PLUS Rounded 1c"', t:800, s:500},
+  serif:{fam:'"Noto Serif JP"', t:700, s:500},
+  dela:{fam:'"Dela Gothic One"', t:400, s:500, subFam:'"Zen Kaku Gothic New"'},
+};
+const FALLBACK = ',"Hiragino Sans","Yu Gothic",sans-serif';
+
+/* ---------- State ---------- */
+const DEFAULTS = {
+  preset:"header", title:"空模様を、ひと目で。", sub:"1時間ごとの雨雲レーダーとウィジェット",
+  font:"zen", textColor:"#FFFFFF", titleScale:1, align:"center",
+  bgMode:"gradient", c1:"#14235E", c2:"#4F8FE8", angle:120, imgScale:1, imgX:0.5, imgY:0.5, dim:0,
+  iconLayout:"stack", showSafe:true,
+};
+const state = Object.assign({}, DEFAULTS);
+const images = {bg:null, icon:null, shot:null};
+try { const saved = JSON.parse(localStorage.getItem("assetpress:v1")||"null"); if (saved) Object.assign(state, saved); } catch(e) {}
+const persist = () => { try { localStorage.setItem("assetpress:v1", JSON.stringify(state)); } catch(e) {} };
+const presetOf = id => PRESETS.find(p => p.id === id) || PRESETS[0];
+
+/* ---------- DOM ---------- */
+const $ = id => document.getElementById(id);
+const canvas = $("preview"), pctx = canvas.getContext("2d");
+
+function buildPresetList(){
+  const host = $("presets");
+  for (const g of Object.keys(GROUPS)){
+    const wrap = document.createElement("div"); wrap.className = "pgroup";
+    const l = document.createElement("span"); l.className = "lbl"; l.textContent = GROUPS[g]; wrap.appendChild(l);
+    for (const p of PRESETS.filter(x => x.group === g)){
+      const lab = document.createElement("label"); lab.className = "preset";
+      lab.innerHTML = `<input type="radio" name="preset" value="${p.id}"><span></span><span class="px">${p.w}×${p.h}</span>`;
+      lab.children[1].textContent = p.name;
+      wrap.appendChild(lab);
+    }
+    host.appendChild(wrap);
+  }
+  const rows = $("specRows");
+  for (const p of PRESETS){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td></td><td class="px">${p.w} × ${p.h}</td><td>${p.ratio}</td><td></td>`;
+    tr.children[0].textContent = `${GROUPS[p.group].replace(/(.*)/, "$1")}:${p.name}`;
+    tr.children[3].textContent = p.note + (p.formats.length === 1 ? "" : " 形式: PNG / JPEG。");
+    rows.appendChild(tr);
+  }
+}
+
+function syncForm(){
+  const f = $("panel");
+  f.querySelectorAll('input[name="preset"]').forEach(i => i.checked = i.value === state.preset);
+  f.querySelectorAll('input[name="align"]').forEach(i => i.checked = i.value === state.align);
+  f.querySelectorAll('input[name="bgMode"]').forEach(i => i.checked = i.value === state.bgMode);
+  f.querySelectorAll('input[name="iconLayout"]').forEach(i => i.checked = i.value === state.iconLayout);
+  for (const k of ["title","sub","font","textColor","titleScale","c1","c2","angle","imgScale","imgX","imgY","dim"]) $(k).value = state[k];
+  $("showSafe").checked = state.showSafe;
+  syncVisibility();
+}
+function syncVisibility(){
+  const p = presetOf(state.preset);
+  $("c2wrap").hidden = state.bgMode !== "gradient";
+  $("angleWrap").hidden = state.bgMode !== "gradient";
+  $("imgControls").hidden = state.bgMode !== "image";
+  $("safeToggleWrap").hidden = !p.safe;
+  $("iconLayoutWrap").hidden = !images.icon;
+  $("iconClear").hidden = !images.icon;
+  $("shotClear").hidden = !images.shot;
+  $("shotWrap").style.opacity = p.group === "duo" ? 1 : .55;
+  $("exportJpg").hidden = !p.formats.includes("jpg");
+  $("dropHint").textContent = p.group === "duo" ? "画像をプレビューにドラッグするとアプリの画面になります" : "画像をプレビューにドラッグすると背景になります";
+  $("dimLabel").textContent = `${p.w} × ${p.h} px`;
+  $("ratioLabel").textContent = p.ratio;
+}
+
+/* ---------- Drawing ---------- */
+function rr(ctx, x, y, w, h, r){
+  r = Math.min(r, w/2, h/2);
+  ctx.beginPath(); ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath();
+}
+
+function wrapText(ctx, text, maxW){
+  const out = [];
+  for (const para of String(text).split("\n")){
+    const chars = [...para]; let line = "";
+    for (const ch of chars){
+      const test = line + ch;
+      if (line && ctx.measureText(test).width > maxW){
+        let next = ch;
+        const sp = line.lastIndexOf(" ");
+        // 読点・句点・助詞の後ろなど、自然な位置まで戻って改行する
+        let jp = -1;
+        for (let i = line.length - 1; i >= Math.max(1, line.length - 9); i--){
+          if (/[、。・！？!?」』）]/.test(line[i])) { jp = i + 1; break; }
+        }
+        if (sp > 0 && /^[\x21-\x7E]+$/.test(line.slice(sp+1) + ch)){ next = line.slice(sp+1) + ch; line = line.slice(0, sp); }
+        else if (jp > 0 && jp < line.length){ next = line.slice(jp) + ch; line = line.slice(0, jp); }
+        // 禁則: 行頭に句読点・閉じ括弧を置かない(ぶら下げ)
+        while (next && /^[、。,.，．・」』）)！？!?ーっゃゅょ]/.test(next)){ line += next[0]; next = next.slice(1); }
+        out.push(line.trimEnd()); line = next.trimStart();
+      } else line = test;
+    }
+    out.push(line);
+  }
+  return out.filter((l, i, a) => l !== "" || (i > 0 && i < a.length - 1));
+}
+
+function fitText(ctx, title, sub, maxW, maxH, base){
+  const F = FONTS[state.font] || FONTS.zen;
+  const subFam = (F.subFam || F.fam) + FALLBACK, fam = F.fam + FALLBACK;
+  let size = base, res;
+  for (let k = 0; k < 60; k++){
+    ctx.font = `${F.t} ${size}px ${fam}`;
+    const tl = title.trim() ? wrapText(ctx, title.trim(), maxW) : [];
+    const ss = title.trim() ? size * 0.4 : size * 0.6;
+    ctx.font = `${F.s} ${ss}px ${subFam}`;
+    const sl = sub.trim() ? wrapText(ctx, sub.trim(), maxW) : [];
+    const lh = size * 1.2, lhs = ss * 1.5, gap = (tl.length && sl.length) ? size * 0.32 : 0;
+    const h = tl.length * lh + gap + sl.length * lhs;
+    res = {size, ss, tl, sl, lh, lhs, gap, h, fam, subFam, F};
+    if ((h <= maxH && tl.length <= 3 && sl.length <= 3) || size < 6) break;
+    size *= 0.95;
+  }
+  // 実際の最大行幅
+  let mw = 0;
+  ctx.font = `${res.F.t} ${res.size}px ${res.fam}`; res.tl.forEach(l => mw = Math.max(mw, ctx.measureText(l).width));
+  ctx.font = `${res.F.s} ${res.ss}px ${res.subFam}`; res.sl.forEach(l => mw = Math.max(mw, ctx.measureText(l).width));
+  res.w = mw;
+  return res;
+}
+
+function drawTextBlock(ctx, t, x, y, w, align){
+  ctx.fillStyle = state.textColor; ctx.textBaseline = "middle";
+  ctx.textAlign = align === "left" ? "left" : "center";
+  const ax = align === "left" ? x : x + w / 2;
+  let cy = y;
+  ctx.font = `${t.F.t} ${t.size}px ${t.fam}`;
+  for (const l of t.tl){ ctx.fillText(l, ax, cy + t.lh / 2); cy += t.lh; }
+  cy += t.gap;
+  ctx.font = `${t.F.s} ${t.ss}px ${t.subFam}`;
+  ctx.globalAlpha = 0.88;
+  for (const l of t.sl){ ctx.fillText(l, ax, cy + t.lhs / 2); cy += t.lhs; }
+  ctx.globalAlpha = 1;
+}
+
+function drawBackground(ctx, W, H){
+  ctx.fillStyle = state.c1; ctx.fillRect(0, 0, W, H);
+  if (state.bgMode === "gradient"){
+    const a = (state.angle - 90) * Math.PI / 180, dx = Math.cos(a), dy = Math.sin(a);
+    const len = (Math.abs(W * dx) + Math.abs(H * dy)) / 2;
+    const g = ctx.createLinearGradient(W/2 - dx*len, H/2 - dy*len, W/2 + dx*len, H/2 + dy*len);
+    g.addColorStop(0, state.c1); g.addColorStop(1, state.c2);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  } else if (state.bgMode === "image" && images.bg){
+    const im = images.bg, k = Math.max(W / im.width, H / im.height) * state.imgScale;
+    const dw = im.width * k, dh = im.height * k;
+    ctx.drawImage(im, (W - dw) * state.imgX, (H - dh) * state.imgY, dw, dh);
+  }
+  if (state.dim > 0){ ctx.fillStyle = `rgba(0,0,0,${state.dim})`; ctx.fillRect(0, 0, W, H); }
+}
+
+function drawIcon(ctx, x, y, size){
+  ctx.save(); rr(ctx, x, y, size, size, size * 0.2237); ctx.clip();
+  ctx.drawImage(images.icon, x, y, size, size); ctx.restore();
+}
+
+function drawCreative(ctx, P, s){
+  const W = P.w * s, H = P.h * s;
+  const [bx, by, bw, bh] = P.safe ? P.safe.map(v => v * s) : [W * .1, H * .12, W * .8, H * .76];
+  const icon = images.icon, inline = icon && state.iconLayout === "inline";
+  const iconSize = icon ? (inline ? bh * 0.5 : bh * 0.3) : 0;
+  const gap = icon ? bh * 0.08 : 0;
+  const base = (P.safe ? bh * 0.2 : Math.min(bw, bh) * 0.13) * state.titleScale;
+  if (inline){
+    const t = fitText(ctx, state.title, state.sub, bw - iconSize - gap, bh, base);
+    const groupW = iconSize + gap + t.w;
+    const gx = state.align === "left" ? bx : bx + (bw - groupW) / 2;
+    drawIcon(ctx, gx, by + (bh - iconSize) / 2, iconSize);
+    drawTextBlock(ctx, t, gx + iconSize + gap, by + (bh - t.h) / 2, t.w, "left");
+  } else {
+    const t = fitText(ctx, state.title, state.sub, bw, bh - iconSize - gap, base);
+    const total = iconSize + gap + t.h; let y = by + (bh - total) / 2;
+    if (icon){ const ix = state.align === "left" ? bx : bx + (bw - iconSize) / 2; drawIcon(ctx, ix, y, iconSize); y += iconSize + gap; }
+    drawTextBlock(ctx, t, bx, y, bw, state.align);
+  }
+}
+
+function drawScreenshot(ctx, P, s){
+  const W = P.w * s, H = P.h * s, m = Math.min(W, H) * 0.06, land = W > H;
+  let cap, area;
+  if (land){ cap = [m, m, W * 0.34 - m, H - 2*m]; area = [W * 0.34 + m * 0.5, m, W * 0.66 - m * 1.5, H - 2*m]; }
+  else { cap = [m, m * 1.1, W - 2*m, H * 0.17]; area = [m * 1.2, m * 1.1 + H * 0.17 + m * 0.9, W - 2.4*m, 0]; area[3] = H - area[1] - m * 0.8; }
+  // caption
+  let cy = cap[1], ch = cap[3];
+  if (images.icon){
+    const isz = land ? Math.min(cap[2], cap[3]) * 0.22 : cap[3] * 0.42;
+    const ix = (land || state.align === "left") ? cap[0] : cap[0] + (cap[2] - isz) / 2;
+    drawIcon(ctx, ix, land ? cap[1] + cap[3] * 0.18 : cap[1], isz);
+    cy = (land ? cap[1] + cap[3] * 0.18 : cap[1]) + isz * 1.18; ch = cap[3] - (cy - cap[1]);
+  }
+  const base = (land ? cap[2] * 0.15 : cap[3] * 0.34) * state.titleScale;
+  const t = fitText(ctx, state.title, state.sub, cap[2], ch, base);
+  const ty = land ? (images.icon ? cy : cap[1] + (cap[3] - t.h) / 2) : cy + (ch - t.h) / 2;
+  drawTextBlock(ctx, t, cap[0], ty, cap[2], land ? "left" : state.align);
+  // app screen
+  const ratio = images.shot ? images.shot.width / images.shot.height : P.w / P.h;
+  let dw = area[2], dh = dw / ratio;
+  if (dh > area[3]){ dh = area[3]; dw = dh * ratio; }
+  const dx = area[0] + (area[2] - dw) / 2, dy = land ? area[1] + (area[3] - dh) / 2 : area[1];
+  const r = Math.min(dw, dh) * 0.045;
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,.35)"; ctx.shadowBlur = m * 0.6; ctx.shadowOffsetY = m * 0.15;
+  rr(ctx, dx, dy, dw, dh, r); ctx.fillStyle = "#0B0F1A"; ctx.fill();
+  ctx.restore();
+  ctx.save(); rr(ctx, dx, dy, dw, dh, r); ctx.clip();
+  if (images.shot) ctx.drawImage(images.shot, dx, dy, dw, dh);
+  else {
+    ctx.fillStyle = "#E9EDF5"; ctx.fillRect(dx, dy, dw, dh);
+    ctx.fillStyle = "#C9D0DE";
+    const pad = dw * 0.07;
+    for (let i = 0; i < 5; i++) { rr(ctx, dx + pad, dy + pad + i * dh * 0.14, dw - 2*pad, dh * 0.1, dw * 0.02); ctx.fill(); }
+    ctx.fillStyle = "#5A6379"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.font = `600 ${Math.max(10, dw * 0.045)}px "IBM Plex Sans JP",sans-serif`;
+    ctx.fillText("アプリの画面をここに入れる", dx + dw / 2, dy + dh * 0.92);
+  }
+  ctx.restore();
+}
+
+function drawSafe(ctx, P, s){
+  const W = P.w * s, H = P.h * s, [x, y, w, h] = P.safe.map(v => v * s);
+  ctx.save();
+  ctx.fillStyle = "rgba(8,12,28,.42)";
+  ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.rect(x, y, w, h); ctx.fill("evenodd");
+  ctx.setLineDash([Math.max(4, W * .004), Math.max(3, W * .003)]);
+  ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.lineWidth = Math.max(1, W * .0012); ctx.strokeRect(x, y, w, h);
+  ctx.setLineDash([]);
+  ctx.fillStyle = "rgba(255,255,255,.92)"; ctx.font = `600 ${Math.max(10, W * .011)}px "IBM Plex Sans JP",sans-serif`;
+  ctx.textAlign = "left"; ctx.textBaseline = "bottom";
+  ctx.fillText(`セーフエリア ${P.safe[2]}×${P.safe[3]}(どの端末でも切れない範囲)`, x, y - W * .004);
+  ctx.restore();
+}
+
+function render(ctx, P, s, overlay){
+  const W = P.w * s, H = P.h * s;
+  ctx.save(); ctx.clearRect(0, 0, W, H);
+  drawBackground(ctx, W, H);
+  if (P.group === "duo") drawScreenshot(ctx, P, s); else drawCreative(ctx, P, s);
+  ctx.restore();
+  if (overlay && P.safe && state.showSafe) drawSafe(ctx, P, s);
+}
+
+let fontsReady = Promise.resolve();
+function loadFonts(){
+  const F = FONTS[state.font] || FONTS.zen, txt = (state.title + state.sub) || "あ";
+  fontsReady = Promise.all([
+    document.fonts.load(`${F.t} 64px ${F.fam}`, txt),
+    document.fonts.load(`${F.s} 32px ${F.subFam || F.fam}`, txt),
+    document.fonts.load(`600 20px "IBM Plex Sans JP"`, "セーフエリアアプリの画面をここに入れる"),
+  ]).catch(() => {});
+  return fontsReady;
+}
+
+let raf = 0;
+function schedule(){
+  cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(async () => {
+    await loadFonts();
+    const P = presetOf(state.preset);
+    const wrapW = $("dropzone").clientWidth - 36;
+    const maxH = Math.max(260, window.innerHeight * 0.62);
+    const cssW = Math.max(200, Math.min(wrapW, maxH * P.w / P.h));
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const pxW = Math.min(P.w, Math.round(cssW * dpr));
+    const s = pxW / P.w;
+    canvas.width = pxW; canvas.height = Math.round(P.h * s);
+    canvas.style.width = cssW + "px";
+    render(pctx, P, s, true);
+    renderChecks();
+  });
+}
+
+/* ---------- Checks ---------- */
+function renderChecks(){
+  const P = presetOf(state.preset), text = `${state.title}\n${state.sub}`, list = [];
+  const add = (level, t) => list.push([level, t]);
+  add("ok", `${P.w}×${P.h}px ちょうどで書き出します。`);
+  add("ok", "PNG はアルファチャンネルなし(RGB)で書き出します。Apple は透過・アルファを含む画像を受け付けません。");
+  if (P.safe) add("ok", "文字とアイコンはセーフエリアの中に自動で収めています。");
+  if (/[¥$€£]\s?\d|\d[\d,]*\s?(円|ドル)|\d+\s?[%％]\s?(off|オフ)?|割引|半額|セール|sale\b|無料|free\b/i.test(text))
+    add("warn", "価格・割引・「無料」などの表記があります。Apple は素材に価格や割引を入れないよう求めています。");
+  if (/https?:\/\/|www\.|\.(com|jp|net|io|app)\b/i.test(text)) add("warn", "URL が含まれています。素材に Web サイトの URL は入れられません。");
+  if (/©|\(c\)|copyright/i.test(text)) add("warn", "著作権記号は入れないよう求められています。");
+  if (/editor'?s\s?choice|app of the day|game of the day|apple design award|エディターズ\s?チョイス|今日の\s?(app|アプリ|ゲーム)/i.test(text))
+    add("warn", "Apple の表彰(Editor's Choice、今日の App など)の表記は使えません。");
+  if (/no\.?\s?1\b|#1\b|ナンバー\s?ワン|1\s?位|ランキング|受賞|award/i.test(text))
+    add("warn", "ランキングや受賞の表記は、事実で確認できる場合のみ。Apple 広告に流用する場合は使えません。");
+  if (/android|google play|play store|galaxy|windows/i.test(text)) add("warn", "他のプラットフォームやストアの名前は入れられません。");
+  if (P.group === "creative" && [...state.title.replace(/\s/g, "")].length > 22) add("info", "見出しが長めです。Apple は「ビジュアルを補う短いフレーズ」を推奨しています。");
+  if (P.group === "event" && state.title.trim()) add("info", "App内イベントの画像には、できるだけ文字やロゴを入れないよう推奨されています(イベント名はカードに別途表示されます)。");
+  if (P.group === "duo"){
+    if (!images.shot) add("warn", "アプリの画面が入っていません。審査では「アプリ使用中の画面」が過半数のスクリーンショットに必要です。");
+    else if (Math.abs(images.shot.width / images.shot.height - P.w / P.h) > 0.04) add("info", `入れた画面の比率(${images.shot.width}×${images.shot.height})がこの書き出し先と違います。同じ向きのディスプレイで撮った画面が最適です。`);
+    else add("ok", "アプリの画面が入っています。");
+  }
+  if (P.group === "creative") add("info", "クリエイティブアセットは iOS 27 / iPadOS 27 以降の App Store に表示されます。言語ごとに用意できます。");
+  if (P.id === "universal") add("info", "ユニバーサルは PNG のみ。App Store Connect で「ヘッダーアセットを検索結果にも使う」を選べます。");
+  if (state.bgMode === "image" && !images.bg) add("info", "背景画像がまだありません。ファイルを選ぶか、プレビューへドラッグしてください。");
+  const ul = $("checks"); ul.textContent = "";
+  for (const [lv, t] of list){ const li = document.createElement("li"); li.className = lv; li.textContent = t; ul.appendChild(li); }
+}
+
+/* ---------- PNG (RGB, no alpha) encoder ---------- */
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(buf){ let c = 0xFFFFFFFF; for (let i = 0; i < buf.length; i++) c = CRC[(c ^ buf[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function chunk(type, data){
+  const out = new Uint8Array(12 + data.length), dv = new DataView(out.buffer);
+  dv.setUint32(0, data.length);
+  for (let i = 0; i < 4; i++) out[4 + i] = type.charCodeAt(i);
+  out.set(data, 8);
+  dv.setUint32(8 + data.length, crc32(out.subarray(4, 8 + data.length)));
+  return out;
+}
+async function encodePngRGB(cv){
+  if (typeof CompressionStream === "undefined") return await new Promise(r => cv.toBlob(r, "image/png"));
+  const w = cv.width, h = cv.height, ctx = cv.getContext("2d"), stride = w * 3 + 1;
+  const raw = new Uint8Array(stride * h), STRIP = 128;
+  for (let y0 = 0; y0 < h; y0 += STRIP){
+    const sh = Math.min(STRIP, h - y0), d = ctx.getImageData(0, y0, w, sh).data;
+    for (let r = 0; r < sh; r++){
+      let o = (y0 + r) * stride, p = r * w * 4; raw[o++] = 1; // filter: Sub
+      let pr = 0, pg = 0, pb = 0;
+      for (let x = 0; x < w; x++, p += 4){
+        const R = d[p], G = d[p+1], B = d[p+2];
+        raw[o++] = (R - pr) & 255; raw[o++] = (G - pg) & 255; raw[o++] = (B - pb) & 255;
+        pr = R; pg = G; pb = B;
+      }
+    }
+  }
+  const comp = new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new CompressionStream("deflate"))).arrayBuffer());
+  const ihdr = new Uint8Array(13), dv = new DataView(ihdr.buffer);
+  dv.setUint32(0, w); dv.setUint32(4, h); ihdr[8] = 8; ihdr[9] = 2; // 8bit truecolor (RGB)
+  const srgb = new Uint8Array([0]);
+  return new Blob([new Uint8Array([137,80,78,71,13,10,26,10]), chunk("IHDR", ihdr), chunk("sRGB", srgb), chunk("IDAT", comp), chunk("IEND", new Uint8Array(0))], {type:"image/png"});
+}
+
+/* ---------- Saving ---------- */
+async function saveFile(name, blob){
+  if (window.claude && typeof window.claude.use === "function"){
+    try {
+      const dl = await window.claude.use("downloads");
+      if (dl){ await dl.save({filename:name, data:blob}); return "saved"; }
+    } catch(e){ if (e && e.code === "declined") return "declined"; }
+  }
+  const url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  return "saved";
+}
+const slug = () => (state.title.match(/[A-Za-z0-9]+/g) || ["asset"]).join("-").toLowerCase().slice(0, 24) || "asset";
+
+async function exportPreset(P, fmt){
+  await loadFonts();
+  const off = document.createElement("canvas"); off.width = P.w; off.height = P.h;
+  const ctx = off.getContext("2d");
+  render(ctx, P, 1, false);
+  const blob = fmt === "jpg" ? await new Promise(r => off.toBlob(r, "image/jpeg", 0.92)) : await encodePngRGB(off);
+  off.width = off.height = 1;
+  return saveFile(`${slug()}-${P.id}-${P.w}x${P.h}.${fmt === "jpg" ? "jpg" : "png"}`, blob);
+}
+
+async function runExport(list, fmt){
+  const btns = ["exportPng","exportJpg","exportTrio"].map($); btns.forEach(b => b.disabled = true);
+  const st = $("status");
+  try {
+    let done = 0;
+    for (const P of list){
+      st.textContent = `書き出し中:${P.name}(${P.w}×${P.h})`;
+      const r = await exportPreset(P, fmt);
+      if (r === "declined"){ st.textContent = "保存をキャンセルしました。"; return; }
+      done++;
+    }
+    st.textContent = done > 1 ? `${done} 枚を書き出しました。` : "書き出しました。";
+  } catch(e){
+    st.textContent = "書き出しに失敗しました。ブラウザのメモリが不足している可能性があります。別のブラウザか、サイズの小さい書き出し先で試してください。";
+  } finally { btns.forEach(b => b.disabled = false); }
+}
+
+/* ---------- Image loading ---------- */
+function loadImage(file){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onload = () => res(im); im.onerror = rej; im.src = url;
+  });
+}
+async function setImage(kind, file){
+  if (!file || !file.type.startsWith("image/")) return;
+  try {
+    images[kind] = await loadImage(file);
+    if (kind === "bg"){ state.bgMode = "image"; if (state.dim === 0) state.dim = 0.25; syncForm(); }
+    syncVisibility(); schedule(); persist();
+  } catch(e){ $("status").textContent = "画像を読み込めませんでした。PNG か JPEG を選んでください。"; }
+}
+
+/* ---------- Events ---------- */
+function bind(){
+  const f = $("panel");
+  f.addEventListener("input", e => {
+    const t = e.target;
+    if (t.type === "file") return;
+    if (t.type === "radio") state[t.name] = t.value;
+    else if (t.id === "showSafe") state.showSafe = t.checked;
+    else if (t.id in state) state[t.id] = t.type === "range" ? parseFloat(t.value) : t.value;
+    syncVisibility(); schedule(); persist();
+  });
+  f.addEventListener("submit", e => e.preventDefault());
+  $("showSafe").addEventListener("change", e => { state.showSafe = e.target.checked; schedule(); persist(); });
+  $("bgFile").addEventListener("change", e => setImage("bg", e.target.files[0]));
+  $("iconFile").addEventListener("change", e => setImage("icon", e.target.files[0]));
+  $("shotFile").addEventListener("change", e => setImage("shot", e.target.files[0]));
+  $("iconClear").addEventListener("click", () => { images.icon = null; $("iconFile").value = ""; syncVisibility(); schedule(); });
+  $("shotClear").addEventListener("click", () => { images.shot = null; $("shotFile").value = ""; syncVisibility(); schedule(); });
+  const dz = $("dropzone");
+  dz.addEventListener("dragover", e => { e.preventDefault(); });
+  dz.addEventListener("drop", e => { e.preventDefault(); const file = e.dataTransfer.files[0]; if (file) setImage(presetOf(state.preset).group === "duo" ? "shot" : "bg", file); });
+  $("exportPng").addEventListener("click", () => runExport([presetOf(state.preset)], "png"));
+  $("exportJpg").addEventListener("click", () => runExport([presetOf(state.preset)], "jpg"));
+  $("exportTrio").addEventListener("click", () => runExport(PRESETS.filter(p => p.group === "creative"), "png"));
+  window.addEventListener("resize", schedule);
+}
+
+buildPresetList(); syncForm(); bind(); schedule();
+})();
+</script>
+</body>
+</html>
