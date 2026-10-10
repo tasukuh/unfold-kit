@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Unfold Kit</title>
-<meta name="description" content="App Store の新しいクリエイティブ素材と iPhone Duo 対応のための、無料・登録不要のブラウザツール集。">
+<meta name="description" content="Free browser tools for the App Store's new creative assets and iPhone Duo: an asset maker and a layout planner. English, Japanese, Korean and German.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+JP:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+JP:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600;900&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap">
 <style>
 /* Layout: a short statement, then the two tools side by side as the only actions on the page. */
 :root{
   --paper:#F3F5F9; --surface:#FFFFFF; --ink:#161C2E; --ink-2:#5A6379; --rule:#D5DAE5;
   --accent:#3246C6; --fold:#D98A1C; --fold-soft:#F7E3C4;
-  --f-display:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
-  --f-body:"IBM Plex Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-display:"Zen Kaku Gothic New","Noto Sans KR","Hiragino Sans","Apple SD Gothic Neo","Yu Gothic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans JP","Noto Sans KR","Hiragino Sans","Apple SD Gothic Neo","Yu Gothic",system-ui,sans-serif;
   --f-data:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   color-scheme:light;
 }
@@ -28,7 +28,9 @@
 html,body{margin:0}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.7;padding-inline:20px;padding-block:0 48px}
 .wrap{max-width:980px;margin:0 auto}
-header{padding-block:56px 36px;display:grid;gap:14px}
+header{padding-block:20px 36px;display:grid;gap:14px}
+.langbar{display:flex;justify-content:flex-end;margin-bottom:28px}
+.lang{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:4px 8px}
 h1{font-family:var(--f-display);font-weight:900;font-size:clamp(34px,6vw,56px);line-height:1.1;margin:0;letter-spacing:-.01em}
 h1 .crease{display:inline-block;border-left:3px dashed var(--fold);margin:0 .12em;height:.9em;vertical-align:-.08em}
 .lede{font-size:17px;color:var(--ink-2);max-width:60ch;margin:0;text-wrap:pretty}
@@ -53,46 +55,105 @@ footer a{color:var(--accent)}
 <body>
 <div class="wrap">
 <header>
+  <div class="langbar"><select id="langSel" class="lang" aria-label="Language"></select></div>
   <h1>Unfold<span class="crease" aria-hidden="true"></span>Kit</h1>
-  <p class="lede">2026 年秋の App Store と iPhone Duo の変更に、今日から備えるための無料ツールです。登録不要、画像はブラウザの外に出ません。</p>
+  <p class="lede" data-i18n="lede">2026 年秋の App Store と iPhone Duo の変更に、今日から備えるための無料ツールです。登録不要、画像はブラウザの外に出ません。</p>
 </header>
 
 <main class="tools">
-  <a class="tool" href="/asset-press">
+  <a class="tool" href="/asset-press" data-keep-lang>
     <h2>Asset Press</h2>
-    <span class="what">App Store の新しいクリエイティブ素材を作る</span>
-    <p>プロダクトページヘッダー、検索結果アセット、iPhone Duo スクリーンショットを、規定サイズぴったり・アルファなし PNG で書き出します。</p>
+    <span class="what" data-i18n="apWhat">App Store の新しいクリエイティブ素材を作る</span>
+    <p data-i18n="apDesc">プロダクトページヘッダー、検索結果アセット、iPhone Duo スクリーンショットを、規定サイズぴったり・アルファなし PNG で書き出します。</p>
     <ul>
-      <li>Apple テンプレートのセーフエリアを表示</li>
-      <li>価格・URL・表彰表記などを提出前にチェック</li>
-      <li>3 種類のクリエイティブを一括書き出し</li>
+      <li data-i18n="ap1">Apple テンプレートのセーフエリアを表示</li>
+      <li data-i18n="ap2">価格・URL・表彰表記などを提出前にチェック</li>
+      <li data-i18n="ap3">3 種類のクリエイティブを一括書き出し</li>
     </ul>
-    <span class="dims">3840×1646 ・ 3840×2560 ・ 5244×2950 ・ 1398×2034 ・ 2007×2853</span>
-    <span class="go">Asset Press を開く</span>
+    <span class="dims">3840×1646 · 3840×2560 · 5244×2950 · 1398×2034 · 2007×2853</span>
+    <span class="go" data-i18n="apGo">Asset Press を開く</span>
   </a>
-  <a class="tool" href="/fold-planner">
+  <a class="tool" href="/fold-planner" data-keep-lang>
     <h2>Fold Planner</h2>
-    <span class="what">iPhone Duo でのレイアウトを提案する</span>
-    <p>アプリの種類を選ぶと、閉じた状態・開いた状態・半開きなど 6 つのポーズでの推奨レイアウトを同じ縮尺の図で示します。</p>
+    <span class="what" data-i18n="fpWhat">iPhone Duo でのレイアウトを提案する</span>
+    <p data-i18n="fpDesc">アプリの種類を選ぶと、閉じた状態・開いた状態・半開きなど 6 つのポーズでの推奨レイアウトを同じ縮尺の図で示します。</p>
     <ul>
-      <li>折り目・縦に並ぶツールバーを反映した図</li>
-      <li>API 名つきの実装チェックリスト</li>
-      <li>Markdown でチケットや README に貼れる</li>
+      <li data-i18n="fp1">折り目・縦に並ぶツールバーを反映した図</li>
+      <li data-i18n="fp2">API 名つきの実装チェックリスト</li>
+      <li data-i18n="fp3">Markdown でチケットや README に貼れる</li>
     </ul>
-    <span class="dims">外側 466×678pt ・ 内側 669×951pt(推定)</span>
-    <span class="go">Fold Planner を開く</span>
+    <span class="dims" data-i18n="fpDims">外側 466×678pt ・ 内側 669×951pt(推定)</span>
+    <span class="go" data-i18n="fpGo">Fold Planner を開く</span>
   </a>
 </main>
 
-<section class="facts" aria-label="主な日付">
-  <div><b>10 月 5 日</b><span>ヘッダー・検索結果アセットと Duo のスクリーンショット提出が開始</span></div>
-  <div><b>10 月 23 日</b><span>iPhone Duo 発売(iOS 27.1)</span></div>
-  <div><b>2027 年 4 月</b><span>提出時に iPhone Duo のスクリーンショットが必須に</span></div>
+<section class="facts" id="facts" aria-label="主な日付">
+  <div><b data-i18n="d1">10 月 5 日</b><span data-i18n="d1t">ヘッダー・検索結果アセットと Duo のスクリーンショット提出が開始</span></div>
+  <div><b data-i18n="d2">10 月 23 日</b><span data-i18n="d2t">iPhone Duo 発売(iOS 27.1)</span></div>
+  <div><b data-i18n="d3">2027 年 4 月</b><span data-i18n="d3t">提出時に iPhone Duo のスクリーンショットが必須に</span></div>
 </section>
 
 <footer>
-  <p>Apple、App Store、iPhone は Apple Inc. の商標です。このサイトは Apple とは関係のない非公式ツールです。 ・ <a href="https://github.com/tasukuh/unfold-kit" target="_blank" rel="noopener" id="repoLink">ソースコード(MIT)</a></p>
+  <p><span data-i18n="tm">Apple、App Store、iPhone は Apple Inc. の商標です。このサイトは Apple とは関係のない非公式ツールです。</span> · <a href="https://github.com/tasukuh/unfold-kit" target="_blank" rel="noopener" id="repoLink" data-i18n="src">ソースコード(MIT)</a></p>
 </footer>
 </div>
+
+<script>
+(() => {
+"use strict";
+const LANGS = {ja:"日本語", en:"English", ko:"한국어", de:"Deutsch"};
+function detectLang(){
+  try { const q = new URLSearchParams(location.search).get("lang"); if (q && LANGS[q]) return q; } catch(e) {}
+  try { const s = localStorage.getItem("unfoldkit:lang"); if (s && LANGS[s]) return s; } catch(e) {}
+  for (const l of (navigator.languages || [navigator.language || "en"])){ const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
+  return "en";
+}
+let lang = detectLang();
+const UI = {
+  lede:{ja:"2026 年秋の App Store と iPhone Duo の変更に、今日から備えるための無料ツールです。登録不要、画像はブラウザの外に出ません。", en:"Free tools to get ready for the fall 2026 changes to the App Store and the arrival of iPhone Duo. No sign-up, and your images never leave your browser.", ko:"2026년 가을 App Store와 iPhone Duo 변화에 오늘부터 대비하는 무료 도구입니다. 가입이 필요 없고, 이미지는 브라우저 밖으로 나가지 않습니다.", de:"Kostenlose Tools für die Änderungen im App Store im Herbst 2026 und das neue iPhone Duo. Ohne Anmeldung, und deine Bilder verlassen nie den Browser."},
+  apWhat:{ja:"App Store の新しいクリエイティブ素材を作る", en:"Make the App Store’s new creative assets", ko:"App Store의 새 크리에이티브 에셋 만들기", de:"Die neuen Creative Assets für den App Store erstellen"},
+  apDesc:{ja:"プロダクトページヘッダー、検索結果アセット、iPhone Duo スクリーンショットを、規定サイズぴったり・アルファなし PNG で書き出します。", en:"Export product page headers, search results assets and iPhone Duo screenshots at exact sizes, as PNGs with no alpha channel.", ko:"제품 페이지 헤더, 검색 결과 에셋, iPhone Duo 스크린샷을 규정 크기 그대로 알파 없는 PNG로 내보냅니다.", de:"Exportiert Produktseiten-Header, Suchergebnis-Assets und iPhone Duo-Screenshots in exakter Größe als PNG ohne Alphakanal."},
+  ap1:{ja:"Apple テンプレートのセーフエリアを表示", en:"Shows the safe area from Apple’s template", ko:"Apple 템플릿의 세이프 영역 표시", de:"Zeigt den Sicherheitsbereich aus Apples Vorlage"},
+  ap2:{ja:"価格・URL・表彰表記などを提出前にチェック", en:"Flags prices, URLs and award claims before you submit", ko:"가격·URL·수상 표기 등을 제출 전에 체크", de:"Markiert Preise, URLs und Auszeichnungen vor dem Einreichen"},
+  ap3:{ja:"3 種類のクリエイティブを一括書き出し", en:"Exports all three creative assets at once", ko:"3종류의 크리에이티브를 한꺼번에 내보내기", de:"Exportiert alle drei Creative Assets auf einmal"},
+  apGo:{ja:"Asset Press を開く", en:"Open Asset Press", ko:"Asset Press 열기", de:"Asset Press öffnen"},
+  fpWhat:{ja:"iPhone Duo でのレイアウトを提案する", en:"Plan your layout for iPhone Duo", ko:"iPhone Duo 레이아웃 제안", de:"Dein Layout für das iPhone Duo planen"},
+  fpDesc:{ja:"アプリの種類を選ぶと、閉じた状態・開いた状態・半開きなど 6 つのポーズでの推奨レイアウトを同じ縮尺の図で示します。", en:"Pick your app’s category to see recommended layouts in six poses, closed, open and half-folded, drawn to the same scale.", ko:"앱 종류를 고르면 닫힘·펼침·반쯤 접힘 등 6가지 자세의 추천 레이아웃을 같은 축척의 그림으로 보여 줍니다.", de:"Wähle die Kategorie deiner App und sieh empfohlene Layouts für sechs Haltungen (zugeklappt, aufgeklappt, halb gefaltet) im gleichen Maßstab."},
+  fp1:{ja:"折り目・縦に並ぶツールバーを反映した図", en:"Diagrams that show the fold and vertical toolbars", ko:"접힘과 세로 툴바를 반영한 그림", de:"Skizzen mit Falz und senkrechten Leisten"},
+  fp2:{ja:"API 名つきの実装チェックリスト", en:"Implementation checklist with API names", ko:"API 이름이 붙은 구현 체크리스트", de:"Umsetzungs-Checkliste mit API-Namen"},
+  fp3:{ja:"Markdown でチケットや README に貼れる", en:"Copy as Markdown into tickets or a README", ko:"Markdown으로 티켓이나 README에 붙여 넣기", de:"Als Markdown in Tickets oder ein README einfügen"},
+  fpDims:{ja:"外側 466×678pt ・ 内側 669×951pt(推定)", en:"Outer 466×678 pt · inner 669×951 pt (est.)", ko:"외부 466×678pt · 내부 669×951pt(추정)", de:"Außen 466×678 pt · innen 669×951 pt (geschätzt)"},
+  fpGo:{ja:"Fold Planner を開く", en:"Open Fold Planner", ko:"Fold Planner 열기", de:"Fold Planner öffnen"},
+  facts:{ja:"主な日付", en:"Key dates", ko:"주요 일정", de:"Wichtige Termine"},
+  d1:{ja:"10 月 5 日", en:"October 5", ko:"10월 5일", de:"5. Oktober"},
+  d1t:{ja:"ヘッダー・検索結果アセットと Duo のスクリーンショット提出が開始", en:"Header and search results assets, and iPhone Duo screenshot uploads, open", ko:"헤더·검색 결과 에셋과 Duo 스크린샷 제출 시작", de:"Header- und Suchergebnis-Assets sowie Duo-Screenshots können eingereicht werden"},
+  d2:{ja:"10 月 23 日", en:"October 23", ko:"10월 23일", de:"23. Oktober"},
+  d2t:{ja:"iPhone Duo 発売(iOS 27.1)", en:"iPhone Duo goes on sale (iOS 27.1)", ko:"iPhone Duo 출시(iOS 27.1)", de:"iPhone Duo kommt in den Handel (iOS 27.1)"},
+  d3:{ja:"2027 年 4 月", en:"April 2027", ko:"2027년 4월", de:"April 2027"},
+  d3t:{ja:"提出時に iPhone Duo のスクリーンショットが必須に", en:"iPhone Duo screenshots become required for submissions", ko:"제출 시 iPhone Duo 스크린샷 필수", de:"iPhone Duo-Screenshots werden für Einreichungen Pflicht"},
+  tm:{ja:"Apple、App Store、iPhone は Apple Inc. の商標です。このサイトは Apple とは関係のない非公式ツールです。", en:"Apple, App Store and iPhone are trademarks of Apple Inc. This site is unofficial and not affiliated with Apple.", ko:"Apple, App Store, iPhone은 Apple Inc.의 상표입니다. 이 사이트는 Apple과 관련 없는 비공식 도구입니다.", de:"Apple, App Store und iPhone sind Marken von Apple Inc. Diese Seite ist inoffiziell und steht in keiner Verbindung zu Apple."},
+  src:{ja:"ソースコード(MIT)", en:"Source code (MIT)", ko:"소스 코드(MIT)", de:"Quellcode (MIT)"},
+  langAria:{ja:"言語", en:"Language", ko:"언어", de:"Sprache"},
+};
+const tr = v => v[lang] ?? v.en;
+function apply(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el => { const v = UI[el.dataset.i18n]; if (v) el.textContent = tr(v); });
+  document.getElementById("facts").setAttribute("aria-label", tr(UI.facts));
+  sel.setAttribute("aria-label", tr(UI.langAria));
+  document.querySelectorAll("a[data-keep-lang]").forEach(a => { const base = a.getAttribute("href").split("?")[0]; a.setAttribute("href", `${base}?lang=${lang}`); });
+}
+const sel = document.getElementById("langSel");
+for (const [k, v] of Object.entries(LANGS)){ const o = document.createElement("option"); o.value = k; o.textContent = v; sel.appendChild(o); }
+sel.value = lang;
+sel.addEventListener("change", () => {
+  lang = sel.value;
+  try { localStorage.setItem("unfoldkit:lang", lang); } catch(e) {}
+  try { const u = new URL(location.href); u.searchParams.set("lang", lang); history.replaceState(null, "", u); } catch(e) {}
+  apply();
+});
+apply();
+})();
+</script>
 </body>
 </html>

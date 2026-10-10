@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Asset Press</title>
-<meta name="description" content="App Storeの新しいプロダクトページヘッダー・検索結果アセット・iPhone Duoスクリーンショットを、規定サイズのアルファなしPNGで書き出す無料ツール。">
+<meta name="description" content="Make the App Store's new product page headers, search results assets and iPhone Duo screenshots at exact sizes, as PNGs with no alpha channel. Free, in English, Japanese, Korean and German.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+JP:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=M+PLUS+Rounded+1c:wght@500;800&family=Noto+Serif+JP:wght@500;700&family=Dela+Gothic+One&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+JP:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;700;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=M+PLUS+Rounded+1c:wght@500;800&family=Noto+Serif+JP:wght@500;700&family=Dela+Gothic+One&display=swap">
 <style>
 /* Layout: working stage on the left (live canvas at true aspect), a narrow control column on the right; stacks on phones. */
 :root{
@@ -15,8 +15,8 @@
   --accent:#3246C6; --accent-ink:#FFFFFF; --fold:#D98A1C;
   --ok:#1E7A4C; --warn:#A6570A; --info:#3246C6;
   --stage:#E4E8F0;
-  --f-display:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
-  --f-body:"IBM Plex Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-display:"Zen Kaku Gothic New","Noto Sans KR","Hiragino Sans","Apple SD Gothic Neo","Yu Gothic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans JP","Noto Sans KR","Hiragino Sans","Apple SD Gothic Neo","Yu Gothic",system-ui,sans-serif;
   --f-data:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
   color-scheme:light;
 }
@@ -36,10 +36,11 @@ body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-siz
 a{color:var(--accent)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;padding-block:20px 16px;border-bottom:1px solid var(--rule);margin-bottom:20px}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;padding-block:20px 16px;border-bottom:1px solid var(--rule);margin-bottom:20px}
 .brand{font-family:var(--f-display);font-weight:900;font-size:22px;letter-spacing:.01em;margin:0}
-.brand small{font-weight:500;font-size:13px;color:var(--ink-2);margin-left:10px;letter-spacing:0}
-.top nav{margin-left:auto;display:flex;gap:16px;font-size:13px}
+.brand small{font-weight:500;font-size:13px;color:var(--ink-2);margin-left:10px;letter-spacing:0;display:inline-block}
+.top nav{margin-left:auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-size:13px}
+.lang{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:4px 8px}
 
 .app{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:start}
 @media (max-width:900px){.app{grid-template-columns:minmax(0,1fr)}}
@@ -68,7 +69,6 @@ a{color:var(--accent)}
 .field{display:grid;gap:4px}
 .field > span,.lbl{font-size:12px;color:var(--ink-2);font-weight:500}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 input[type=text],textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:7px 9px}
 textarea{resize:vertical;min-height:58px;line-height:1.5}
 input[type=color]{width:100%;height:34px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);padding:2px}
@@ -84,13 +84,13 @@ input[type=file]{font-size:12px;max-width:100%}
 .preset:has(input:checked){border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 
 .seg{display:flex;border:1px solid var(--rule);border-radius:6px;overflow:hidden}
-.seg label{flex:1;text-align:center;font-size:12.5px;padding:6px 4px;cursor:pointer;background:var(--paper);border-right:1px solid var(--rule)}
+.seg label{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;line-height:1.3;padding:6px 4px;cursor:pointer;background:var(--paper);border-right:1px solid var(--rule)}
 .seg label:last-child{border-right:0}
 .seg input{position:absolute;opacity:0;pointer-events:none}
 .seg label:has(input:checked){background:var(--accent);color:var(--accent-ink)}
 .seg label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:-2px}
 
-.btn{font:inherit;font-weight:600;font-size:13.5px;border-radius:7px;padding:9px 12px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
+.btn{font:inherit;font-weight:600;font-size:13.5px;line-height:1.35;border-radius:7px;padding:9px 12px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
 .btn.ghost{background:transparent;color:var(--accent)}
 .btn.small{font-size:12px;padding:5px 9px;font-weight:500}
 .btn:disabled{opacity:.5;cursor:progress}
@@ -106,161 +106,282 @@ th,td{text-align:left;padding:6px 10px 6px 0;border-bottom:1px solid var(--rule)
 th{font-weight:600;color:var(--ink-2);font-size:12px}
 td.px{font-family:var(--f-data);white-space:nowrap;font-variant-numeric:tabular-nums}
 footer{margin-top:28px;font-size:12px;color:var(--ink-2);display:grid;gap:4px;max-width:80ch}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <header class="top">
-  <h1 class="brand">Asset Press<small>App Storeクリエイティブ素材メーカー</small></h1>
-  <nav><!--repo-only--><a href="/">Unfold Kit</a><a href="/fold-planner">Fold Planner</a><!--/repo-only--><a href="#specs">サイズ一覧</a></nav>
+  <h1 class="brand">Asset Press<small data-i18n="toolSub">App Storeクリエイティブ素材メーカー</small></h1>
+  <nav><!--repo-only--><a href="/" data-keep-lang>Unfold Kit</a><a href="/fold-planner" data-keep-lang>Fold Planner</a><!--/repo-only--><a href="#specs" data-i18n="navSpecs">サイズ一覧</a>
+    <select id="langSel" class="lang" aria-label="Language"></select></nav>
 </header>
 
 <main class="app">
   <div class="stage">
-    <div class="canvas-wrap" id="dropzone"><canvas id="preview" width="1200" height="514" aria-label="書き出し画像のプレビュー"></canvas></div>
+    <div class="canvas-wrap" id="dropzone"><canvas id="preview" width="1200" height="514" data-i18n-aria="previewAria" aria-label="書き出し画像のプレビュー"></canvas></div>
     <div class="meta">
       <span class="dim" id="dimLabel">3840 × 1646 px</span>
       <span id="ratioLabel">21:9</span>
-      <label id="safeToggleWrap"><input type="checkbox" id="showSafe" checked> セーフエリアを表示</label>
+      <label id="safeToggleWrap"><input type="checkbox" id="showSafe" checked> <span data-i18n="showSafe">セーフエリアを表示</span></label>
       <span class="drop-hint" id="dropHint">画像をプレビューにドラッグすると背景になります</span>
     </div>
     <div class="checks" aria-live="polite">
-      <h2>提出前チェック</h2>
+      <h2 data-i18n="checksH">提出前チェック</h2>
       <ul id="checks"></ul>
     </div>
   </div>
 
   <form class="panel" id="panel" autocomplete="off">
     <section>
-      <h2>書き出すもの</h2>
+      <h2 data-i18n="secOutput">書き出すもの</h2>
       <div class="presets" id="presets"></div>
     </section>
 
     <section>
-      <h2>テキスト</h2>
-      <label class="field"><span>見出し(改行できます)</span><textarea id="title" rows="2"></textarea></label>
-      <label class="field"><span>サブテキスト</span><input type="text" id="sub"></label>
+      <h2 data-i18n="secText">テキスト</h2>
+      <label class="field"><span data-i18n="headline">見出し(改行できます)</span><textarea id="title" rows="2"></textarea></label>
+      <label class="field"><span data-i18n="subtext">サブテキスト</span><input type="text" id="sub"></label>
       <div class="row">
-        <label class="field"><span>書体</span>
+        <label class="field"><span data-i18n="typeface">書体</span>
           <select id="font">
-            <option value="zen">ゴシック(Zen Kaku)</option>
-            <option value="rounded">丸ゴシック(M PLUS Rounded)</option>
-            <option value="serif">明朝(Noto Serif)</option>
-            <option value="dela">太字ディスプレイ(Dela Gothic)</option>
+            <option value="zen" data-i18n="fZen">ゴシック(Zen Kaku)</option>
+            <option value="rounded" data-i18n="fRounded">丸ゴシック(M PLUS Rounded)</option>
+            <option value="serif" data-i18n="fSerif">明朝(Noto Serif)</option>
+            <option value="dela" data-i18n="fDela">太字ディスプレイ(Dela Gothic)</option>
           </select></label>
-        <label class="field"><span>文字色</span><input type="color" id="textColor"></label>
+        <label class="field"><span data-i18n="textColor">文字色</span><input type="color" id="textColor"></label>
       </div>
-      <label class="field"><span>文字の大きさ</span><input type="range" id="titleScale" min="0.5" max="1.6" step="0.02"></label>
-      <div class="field"><span class="lbl">揃え</span>
-        <div class="seg" role="radiogroup" aria-label="揃え">
-          <label><input type="radio" name="align" value="center">中央</label>
-          <label><input type="radio" name="align" value="left">左</label>
+      <label class="field"><span data-i18n="textSize">文字の大きさ</span><input type="range" id="titleScale" min="0.5" max="1.6" step="0.02"></label>
+      <div class="field"><span class="lbl" data-i18n="align">揃え</span>
+        <div class="seg" role="radiogroup" data-i18n-aria="align" aria-label="揃え">
+          <label><input type="radio" name="align" value="center"><span data-i18n="center">中央</span></label>
+          <label><input type="radio" name="align" value="left"><span data-i18n="left">左</span></label>
         </div>
       </div>
     </section>
 
     <section>
-      <h2>背景</h2>
-      <div class="seg" role="radiogroup" aria-label="背景の種類">
-        <label><input type="radio" name="bgMode" value="solid">単色</label>
-        <label><input type="radio" name="bgMode" value="gradient">グラデーション</label>
-        <label><input type="radio" name="bgMode" value="image">画像</label>
+      <h2 data-i18n="secBg">背景</h2>
+      <div class="seg" role="radiogroup" data-i18n-aria="bgType" aria-label="背景の種類">
+        <label><input type="radio" name="bgMode" value="solid"><span data-i18n="solid">単色</span></label>
+        <label><input type="radio" name="bgMode" value="gradient"><span data-i18n="gradient">グラデーション</span></label>
+        <label><input type="radio" name="bgMode" value="image"><span data-i18n="image">画像</span></label>
       </div>
       <div class="row">
-        <label class="field"><span>色 1</span><input type="color" id="c1"></label>
-        <label class="field" id="c2wrap"><span>色 2</span><input type="color" id="c2"></label>
+        <label class="field"><span data-i18n="color1">色 1</span><input type="color" id="c1"></label>
+        <label class="field" id="c2wrap"><span data-i18n="color2">色 2</span><input type="color" id="c2"></label>
       </div>
-      <label class="field" id="angleWrap"><span>グラデーションの角度</span><input type="range" id="angle" min="0" max="360" step="5"></label>
+      <label class="field" id="angleWrap"><span data-i18n="angle">グラデーションの角度</span><input type="range" id="angle" min="0" max="360" step="5"></label>
       <div id="imgControls" class="field" hidden>
         <div class="filebox"><input type="file" id="bgFile" accept="image/*"></div>
-        <label class="field"><span>拡大</span><input type="range" id="imgScale" min="1" max="3" step="0.02"></label>
+        <label class="field"><span data-i18n="zoom">拡大</span><input type="range" id="imgScale" min="1" max="3" step="0.02"></label>
         <div class="row">
-          <label class="field"><span>横位置</span><input type="range" id="imgX" min="0" max="1" step="0.01"></label>
-          <label class="field"><span>縦位置</span><input type="range" id="imgY" min="0" max="1" step="0.01"></label>
+          <label class="field"><span data-i18n="posX">横位置</span><input type="range" id="imgX" min="0" max="1" step="0.01"></label>
+          <label class="field"><span data-i18n="posY">縦位置</span><input type="range" id="imgY" min="0" max="1" step="0.01"></label>
         </div>
       </div>
-      <label class="field"><span>暗くする(文字を読みやすく)</span><input type="range" id="dim" min="0" max="0.7" step="0.01"></label>
+      <label class="field"><span data-i18n="dim">暗くする(文字を読みやすく)</span><input type="range" id="dim" min="0" max="0.7" step="0.01"></label>
     </section>
 
     <section>
-      <h2>画像</h2>
-      <div class="field"><span class="lbl">アプリアイコン(任意)</span>
-        <div class="filebox"><input type="file" id="iconFile" accept="image/*"><button type="button" class="btn ghost small" id="iconClear" hidden>外す</button></div>
+      <h2 data-i18n="secImages">画像</h2>
+      <div class="field"><span class="lbl" data-i18n="icon">アプリアイコン(任意)</span>
+        <div class="filebox"><input type="file" id="iconFile" accept="image/*"><button type="button" class="btn ghost small" id="iconClear" data-i18n="remove" hidden>外す</button></div>
       </div>
-      <div class="field" id="iconLayoutWrap"><span class="lbl">アイコンの位置</span>
-        <div class="seg" role="radiogroup" aria-label="アイコンの位置">
-          <label><input type="radio" name="iconLayout" value="stack">文字の上</label>
-          <label><input type="radio" name="iconLayout" value="inline">文字の横</label>
+      <div class="field" id="iconLayoutWrap"><span class="lbl" data-i18n="iconPos">アイコンの位置</span>
+        <div class="seg" role="radiogroup" data-i18n-aria="iconPos" aria-label="アイコンの位置">
+          <label><input type="radio" name="iconLayout" value="stack"><span data-i18n="above">文字の上</span></label>
+          <label><input type="radio" name="iconLayout" value="inline"><span data-i18n="beside">文字の横</span></label>
         </div>
       </div>
-      <div class="field" id="shotWrap"><span class="lbl">アプリの画面(スクリーンショット用)</span>
-        <div class="filebox"><input type="file" id="shotFile" accept="image/*"><button type="button" class="btn ghost small" id="shotClear" hidden>外す</button></div>
-        <span class="drop-hint">Xcode 27.1 の iPhone Duo シミュレーターで撮った画面を入れてください。</span>
+      <div class="field" id="shotWrap"><span class="lbl" data-i18n="appScreen">アプリの画面(スクリーンショット用)</span>
+        <div class="filebox"><input type="file" id="shotFile" accept="image/*"><button type="button" class="btn ghost small" id="shotClear" data-i18n="remove" hidden>外す</button></div>
+        <span class="drop-hint" data-i18n="appScreenHint">Xcode 27.1 の iPhone Duo シミュレーターで撮った画面を入れてください。</span>
       </div>
     </section>
 
     <section class="export">
-      <h2>書き出し</h2>
+      <h2 data-i18n="secExport">書き出し</h2>
       <div class="row">
-        <button type="button" class="btn" id="exportPng">PNG(アルファなし)</button>
+        <button type="button" class="btn" id="exportPng" data-i18n="pngBtn">PNG(アルファなし)</button>
         <button type="button" class="btn ghost" id="exportJpg">JPEG</button>
       </div>
-      <button type="button" class="btn ghost" id="exportTrio">ヘッダー・検索・ユニバーサルを一括書き出し</button>
+      <button type="button" class="btn ghost" id="exportTrio" data-i18n="trio">ヘッダー・検索・ユニバーサルを一括書き出し</button>
       <div class="status" id="status" role="status"></div>
     </section>
   </form>
 </main>
 
 <section class="specs" id="specs" style="margin-top:24px">
-  <h2>サイズ一覧</h2>
+  <h2 data-i18n="navSpecs">サイズ一覧</h2>
   <div class="table-scroll"><table>
-    <thead><tr><th>用途</th><th>サイズ(px)</th><th>比率</th><th>メモ</th></tr></thead>
+    <thead><tr><th data-i18n="thUse">用途</th><th data-i18n="thSize">サイズ(px)</th><th data-i18n="thRatio">比率</th><th data-i18n="thNotes">メモ</th></tr></thead>
     <tbody id="specRows"></tbody>
   </table></div>
 </section>
 
 <footer>
-  <p>画像の処理はすべてこのブラウザの中で行われます。アップロードした画像がサーバーに送られることはありません。</p>
-  <p>セーフエリアは Apple 公式の Sketch テンプレートに描かれた「ART SAFE AREA」を実測した値です。Apple はピクセル単位のセーフエリアを公表していないため、最終確認は App Store Connect のプレビューツールで行ってください。</p>
-  <p>出典: <a href="https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications" target="_blank" rel="noopener">Screenshot specifications</a> / <a href="https://developer.apple.com/app-store/" target="_blank" rel="noopener">App Store asset best practices</a> / <a href="https://blakecrosley.com/blog/app-store-product-page-marketing-2026" target="_blank" rel="noopener">The 2026 App Store Product Page (Blake Crosley)</a></p>
-  <p>Apple、App Store、iPhone は Apple Inc. の商標です。このツールは Apple とは関係のない非公式ツールです。</p>
+  <p data-i18n="fPrivacy">画像の処理はすべてこのブラウザの中で行われます。アップロードした画像がサーバーに送られることはありません。</p>
+  <p data-i18n="fSafe">セーフエリアは Apple 公式の Sketch テンプレートに描かれた「ART SAFE AREA」を実測した値です。Apple はピクセル単位のセーフエリアを公表していないため、最終確認は App Store Connect のプレビューツールで行ってください。</p>
+  <p><span data-i18n="sources">出典</span>: <a href="https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications" target="_blank" rel="noopener">Screenshot specifications</a> / <a href="https://developer.apple.com/app-store/" target="_blank" rel="noopener">App Store asset best practices</a> / <a href="https://blakecrosley.com/blog/app-store-product-page-marketing-2026" target="_blank" rel="noopener">The 2026 App Store Product Page (Blake Crosley)</a></p>
+  <p data-i18n="fTm">Apple、App Store、iPhone は Apple Inc. の商標です。このツールは Apple とは関係のない非公式ツールです。</p>
 </footer>
 
 <script>
 (() => {
 "use strict";
 
+/* ---------- Language ---------- */
+const LANGS = {ja:"日本語", en:"English", ko:"한국어", de:"Deutsch"};
+function detectLang(){
+  try { const q = new URLSearchParams(location.search).get("lang"); if (q && LANGS[q]) return q; } catch(e) {}
+  try { const s = localStorage.getItem("unfoldkit:lang"); if (s && LANGS[s]) return s; } catch(e) {}
+  for (const l of (navigator.languages || [navigator.language || "en"])){ const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
+  return "en";
+}
+let lang = detectLang();
+const tr = v => v == null ? "" : (typeof v === "string" ? v : (v[lang] ?? v.en ?? v.ja));
+const fmt = (v, o) => tr(v).replace(/\{(\w+)\}/g, (_, k) => o[k]);
+
+const UI = {
+  toolSub:{ja:"App Storeクリエイティブ素材メーカー", en:"App Store creative asset maker", ko:"App Store 크리에이티브 에셋 메이커", de:"Creative Assets für den App Store"},
+  navSpecs:{ja:"サイズ一覧", en:"Size reference", ko:"사이즈 목록", de:"Größenübersicht"},
+  previewAria:{ja:"書き出し画像のプレビュー", en:"Preview of the exported image", ko:"내보낼 이미지 미리보기", de:"Vorschau des exportierten Bildes"},
+  showSafe:{ja:"セーフエリアを表示", en:"Show safe area", ko:"세이프 영역 표시", de:"Sicherheitsbereich anzeigen"},
+  dropBg:{ja:"画像をプレビューにドラッグすると背景になります", en:"Drop an image on the preview to use it as the background", ko:"이미지를 미리보기에 끌어다 놓으면 배경이 됩니다", de:"Bild auf die Vorschau ziehen, um es als Hintergrund zu verwenden"},
+  dropShot:{ja:"画像をプレビューにドラッグするとアプリの画面になります", en:"Drop an image on the preview to use it as the app screen", ko:"이미지를 미리보기에 끌어다 놓으면 앱 화면이 됩니다", de:"Bild auf die Vorschau ziehen, um es als App-Bildschirm zu verwenden"},
+  checksH:{ja:"提出前チェック", en:"Pre-submission checks", ko:"제출 전 체크", de:"Prüfung vor dem Einreichen"},
+  secOutput:{ja:"書き出すもの", en:"Output", ko:"내보낼 항목", de:"Ausgabe"},
+  secText:{ja:"テキスト", en:"Text", ko:"텍스트", de:"Text"},
+  headline:{ja:"見出し(改行できます)", en:"Headline (line breaks allowed)", ko:"헤드라인 (줄바꿈 가능)", de:"Überschrift (Zeilenumbrüche möglich)"},
+  subtext:{ja:"サブテキスト", en:"Subtext", ko:"서브 텍스트", de:"Unterzeile"},
+  typeface:{ja:"書体", en:"Typeface", ko:"서체", de:"Schrift"},
+  fZen:{ja:"ゴシック(Zen Kaku)", en:"Sans (Zen Kaku)", ko:"고딕 (Zen Kaku)", de:"Sans (Zen Kaku)"},
+  fRounded:{ja:"丸ゴシック(M PLUS Rounded)", en:"Rounded (M PLUS Rounded)", ko:"둥근 고딕 (M PLUS Rounded)", de:"Abgerundet (M PLUS Rounded)"},
+  fSerif:{ja:"明朝(Noto Serif)", en:"Serif (Noto Serif)", ko:"명조 (Noto Serif)", de:"Serif (Noto Serif)"},
+  fDela:{ja:"太字ディスプレイ(Dela Gothic)", en:"Bold display (Dela Gothic)", ko:"굵은 디스플레이 (Dela Gothic)", de:"Fette Display-Schrift (Dela Gothic)"},
+  textColor:{ja:"文字色", en:"Text color", ko:"글자 색", de:"Textfarbe"},
+  textSize:{ja:"文字の大きさ", en:"Text size", ko:"글자 크기", de:"Textgröße"},
+  align:{ja:"揃え", en:"Alignment", ko:"정렬", de:"Ausrichtung"},
+  center:{ja:"中央", en:"Center", ko:"가운데", de:"Mitte"},
+  left:{ja:"左", en:"Left", ko:"왼쪽", de:"Links"},
+  secBg:{ja:"背景", en:"Background", ko:"배경", de:"Hintergrund"},
+  bgType:{ja:"背景の種類", en:"Background type", ko:"배경 종류", de:"Hintergrundtyp"},
+  solid:{ja:"単色", en:"Solid", ko:"단색", de:"Einfarbig"},
+  gradient:{ja:"グラデーション", en:"Gradient", ko:"그라데이션", de:"Verlauf"},
+  image:{ja:"画像", en:"Image", ko:"이미지", de:"Bild"},
+  color1:{ja:"色 1", en:"Color 1", ko:"색 1", de:"Farbe 1"},
+  color2:{ja:"色 2", en:"Color 2", ko:"색 2", de:"Farbe 2"},
+  angle:{ja:"グラデーションの角度", en:"Gradient angle", ko:"그라데이션 각도", de:"Verlaufswinkel"},
+  zoom:{ja:"拡大", en:"Zoom", ko:"확대", de:"Zoom"},
+  posX:{ja:"横位置", en:"Horizontal position", ko:"가로 위치", de:"Horizontale Position"},
+  posY:{ja:"縦位置", en:"Vertical position", ko:"세로 위치", de:"Vertikale Position"},
+  dim:{ja:"暗くする(文字を読みやすく)", en:"Darken (improves legibility)", ko:"어둡게 (글자 가독성 향상)", de:"Abdunkeln (bessere Lesbarkeit)"},
+  secImages:{ja:"画像", en:"Images", ko:"이미지", de:"Bilder"},
+  icon:{ja:"アプリアイコン(任意)", en:"App icon (optional)", ko:"앱 아이콘 (선택)", de:"App-Symbol (optional)"},
+  remove:{ja:"外す", en:"Remove", ko:"제거", de:"Entfernen"},
+  iconPos:{ja:"アイコンの位置", en:"Icon position", ko:"아이콘 위치", de:"Position des Symbols"},
+  above:{ja:"文字の上", en:"Above text", ko:"텍스트 위", de:"Über dem Text"},
+  beside:{ja:"文字の横", en:"Beside text", ko:"텍스트 옆", de:"Neben dem Text"},
+  appScreen:{ja:"アプリの画面(スクリーンショット用)", en:"App screen (for screenshots)", ko:"앱 화면 (스크린샷용)", de:"App-Bildschirm (für Screenshots)"},
+  appScreenHint:{ja:"Xcode 27.1 の iPhone Duo シミュレーターで撮った画面を入れてください。", en:"Use a capture from the iPhone Duo simulator in Xcode 27.1.", ko:"Xcode 27.1의 iPhone Duo 시뮬레이터에서 캡처한 화면을 넣어 주세요.", de:"Verwende eine Aufnahme aus dem iPhone Duo-Simulator in Xcode 27.1."},
+  secExport:{ja:"書き出し", en:"Export", ko:"내보내기", de:"Export"},
+  pngBtn:{ja:"PNG(アルファなし)", en:"PNG (no alpha)", ko:"PNG (알파 없음)", de:"PNG (ohne Alpha)"},
+  trio:{ja:"ヘッダー・検索・ユニバーサルを一括書き出し", en:"Export header, search and universal at once", ko:"헤더·검색·유니버설 한꺼번에 내보내기", de:"Header, Suche und Universal auf einmal exportieren"},
+  thUse:{ja:"用途", en:"Use", ko:"용도", de:"Verwendung"},
+  thSize:{ja:"サイズ(px)", en:"Size (px)", ko:"크기(px)", de:"Größe (px)"},
+  thRatio:{ja:"比率", en:"Ratio", ko:"비율", de:"Seitenverhältnis"},
+  thNotes:{ja:"メモ", en:"Notes", ko:"메모", de:"Hinweise"},
+  fPrivacy:{ja:"画像の処理はすべてこのブラウザの中で行われます。アップロードした画像がサーバーに送られることはありません。", en:"All image processing happens in your browser. Images you add are never sent to a server.", ko:"모든 이미지 처리는 브라우저 안에서 이루어집니다. 추가한 이미지는 서버로 전송되지 않습니다.", de:"Die gesamte Bildverarbeitung findet in deinem Browser statt. Hinzugefügte Bilder werden nie an einen Server gesendet."},
+  fSafe:{ja:"セーフエリアは Apple 公式の Sketch テンプレートに描かれた「ART SAFE AREA」を実測した値です。Apple はピクセル単位のセーフエリアを公表していないため、最終確認は App Store Connect のプレビューツールで行ってください。", en:"The safe areas are measurements of the “ART SAFE AREA” drawn in Apple’s official Sketch template. Apple doesn’t publish pixel values, so confirm the final result with the preview tool in App Store Connect.", ko:"세이프 영역은 Apple 공식 Sketch 템플릿에 그려진 ‘ART SAFE AREA’를 실측한 값입니다. Apple은 픽셀 단위 값을 공개하지 않으므로 최종 확인은 App Store Connect의 미리보기 도구에서 해 주세요.", de:"Die Sicherheitsbereiche sind Messwerte der „ART SAFE AREA“ aus Apples offizieller Sketch-Vorlage. Apple veröffentlicht keine Pixelwerte. Prüfe das Ergebnis daher im Vorschau-Tool von App Store Connect."},
+  sources:{ja:"出典", en:"Sources", ko:"출처", de:"Quellen"},
+  fTm:{ja:"Apple、App Store、iPhone は Apple Inc. の商標です。このツールは Apple とは関係のない非公式ツールです。", en:"Apple, App Store and iPhone are trademarks of Apple Inc. This is an unofficial tool and is not affiliated with Apple.", ko:"Apple, App Store, iPhone은 Apple Inc.의 상표입니다. 이 도구는 Apple과 관련 없는 비공식 도구입니다.", de:"Apple, App Store und iPhone sind Marken von Apple Inc. Dies ist ein inoffizielles Tool ohne Verbindung zu Apple."},
+  approx:{ja:"約 ", en:"≈ ", ko:"약 ", de:"ca. "},
+  formats:{ja:" 形式: PNG / JPEG。", en:" Formats: PNG / JPEG.", ko:" 형식: PNG / JPEG.", de:" Formate: PNG / JPEG."},
+  safeLabel:{ja:"セーフエリア {w}×{h}(どの端末でも切れない範囲)", en:"Safe area {w}×{h} (never cropped on any device)", ko:"세이프 영역 {w}×{h} (어떤 기기에서도 잘리지 않는 범위)", de:"Sicherheitsbereich {w}×{h} (wird auf keinem Gerät beschnitten)"},
+  placeholder:{ja:"アプリの画面をここに入れる", en:"Add your app screen here", ko:"여기에 앱 화면을 넣으세요", de:"Hier deinen App-Bildschirm einfügen"},
+  // checks
+  cSize:{ja:"{w}×{h}px ちょうどで書き出します。", en:"Exports at exactly {w}×{h} px.", ko:"정확히 {w}×{h}px로 내보냅니다.", de:"Export in genau {w}×{h} px."},
+  cAlpha:{ja:"PNG はアルファチャンネルなし(RGB)で書き出します。Apple は透過・アルファを含む画像を受け付けません。", en:"PNGs are exported as RGB with no alpha channel. Apple doesn’t accept images with transparency or alpha.", ko:"PNG는 알파 채널 없는 RGB로 내보냅니다. Apple은 투명도·알파가 포함된 이미지를 받지 않습니다.", de:"PNGs werden als RGB ohne Alphakanal exportiert. Apple akzeptiert keine Bilder mit Transparenz oder Alphakanal."},
+  cSafe:{ja:"文字とアイコンはセーフエリアの中に自動で収めています。", en:"Text and icon are kept inside the safe area automatically.", ko:"텍스트와 아이콘은 자동으로 세이프 영역 안에 배치됩니다.", de:"Text und Symbol bleiben automatisch im Sicherheitsbereich."},
+  wPrice:{ja:"価格・割引・「無料」などの表記があります。Apple は素材に価格や割引を入れないよう求めています。", en:"Contains a price, discount or “free”. Apple asks that assets not include pricing or discounts.", ko:"가격·할인·‘무료’ 등의 표기가 있습니다. Apple은 에셋에 가격이나 할인을 넣지 않도록 요구합니다.", de:"Enthält einen Preis, Rabatt oder „kostenlos“. Apple verlangt, dass Assets keine Preise oder Rabatte enthalten."},
+  wUrl:{ja:"URL が含まれています。素材に Web サイトの URL は入れられません。", en:"Contains a URL. Website URLs aren’t allowed in assets.", ko:"URL이 포함되어 있습니다. 에셋에는 웹사이트 URL을 넣을 수 없습니다.", de:"Enthält eine URL. Website-URLs sind in Assets nicht erlaubt."},
+  wCopy:{ja:"著作権記号は入れないよう求められています。", en:"Leave out copyright symbols.", ko:"저작권 기호는 넣지 않도록 요구됩니다.", de:"Lass Copyright-Symbole weg."},
+  wApple:{ja:"Apple の表彰(Editor's Choice、今日の App など)の表記は使えません。", en:"Apple recognitions such as Editor’s Choice or App of the Day can’t be used.", ko:"Editor’s Choice, 오늘의 앱 등 Apple의 선정 표기는 사용할 수 없습니다.", de:"Apple-Auszeichnungen wie „Editor’s Choice“ oder „App des Tages“ dürfen nicht verwendet werden."},
+  wRank:{ja:"ランキングや受賞の表記は、事実で確認できる場合のみ。Apple 広告に流用する場合は使えません。", en:"Only use rankings or awards you can verify. They aren’t allowed if you reuse the asset in Apple Ads.", ko:"순위나 수상 표기는 사실로 확인할 수 있을 때만 사용하세요. Apple 광고에 재사용할 경우에는 사용할 수 없습니다.", de:"Verwende Rankings oder Auszeichnungen nur, wenn sie belegbar sind. In Apple Ads sind sie nicht erlaubt."},
+  wPlatform:{ja:"他のプラットフォームやストアの名前は入れられません。", en:"Names of other platforms or stores aren’t allowed.", ko:"다른 플랫폼이나 스토어 이름은 넣을 수 없습니다.", de:"Namen anderer Plattformen oder Stores sind nicht erlaubt."},
+  iLong:{ja:"見出しが長めです。Apple は「ビジュアルを補う短いフレーズ」を推奨しています。", en:"The headline is long. Apple recommends a short phrase that enhances the visual.", ko:"헤드라인이 깁니다. Apple은 비주얼을 보완하는 짧은 문구를 권장합니다.", de:"Die Überschrift ist lang. Apple empfiehlt eine kurze Phrase, die das Motiv ergänzt."},
+  iEvent:{ja:"App内イベントの画像には、できるだけ文字やロゴを入れないよう推奨されています(イベント名はカードに別途表示されます)。", en:"Apple recommends keeping text and logos out of event media where possible. The event name appears on the card separately.", ko:"이벤트 이미지에는 가능하면 텍스트나 로고를 넣지 않도록 권장됩니다(이벤트 이름은 카드에 따로 표시됩니다).", de:"Apple empfiehlt, in Event-Medien möglichst auf Text und Logos zu verzichten. Der Eventname erscheint separat auf der Karte."},
+  wNoShot:{ja:"アプリの画面が入っていません。審査では「アプリ使用中の画面」が過半数のスクリーンショットに必要です。", en:"No app screen yet. App Review requires more than half of your screenshots to show the app in use.", ko:"앱 화면이 들어 있지 않습니다. 심사에서는 스크린샷의 과반수가 ‘앱 사용 중 화면’이어야 합니다.", de:"Noch kein App-Bildschirm. Die App-Prüfung verlangt, dass mehr als die Hälfte der Screenshots die App in Benutzung zeigt."},
+  iRatio:{ja:"入れた画面の比率({w}×{h})がこの書き出し先と違います。同じ向きのディスプレイで撮った画面が最適です。", en:"The screen you added ({w}×{h}) has a different aspect ratio from this output. A capture from the same display and orientation works best.", ko:"넣은 화면({w}×{h})의 비율이 이 내보내기 대상과 다릅니다. 같은 디스플레이·방향에서 캡처한 화면이 가장 좋습니다.", de:"Der eingefügte Bildschirm ({w}×{h}) hat ein anderes Seitenverhältnis als diese Ausgabe. Am besten eignet sich eine Aufnahme vom selben Display in derselben Ausrichtung."},
+  cShot:{ja:"アプリの画面が入っています。", en:"App screen added.", ko:"앱 화면이 들어 있습니다.", de:"App-Bildschirm eingefügt."},
+  iCreative:{ja:"クリエイティブアセットは iOS 27 / iPadOS 27 以降の App Store に表示されます。言語ごとに用意できます。", en:"Creative assets appear on the App Store on iOS 27 and iPadOS 27 or later. You can provide one per language.", ko:"크리에이티브 에셋은 iOS 27 / iPadOS 27 이상의 App Store에 표시됩니다. 언어별로 준비할 수 있습니다.", de:"Creative Assets erscheinen im App Store ab iOS 27 und iPadOS 27. Du kannst pro Sprache eines bereitstellen."},
+  iUniversal:{ja:"ユニバーサルは PNG のみ。App Store Connect で「ヘッダーアセットを検索結果にも使う」を選べます。", en:"Universal assets are PNG only. In App Store Connect you can choose “Use header asset in search results”.", ko:"유니버설은 PNG만 가능합니다. App Store Connect에서 ‘Use header asset in search results’를 선택할 수 있습니다.", de:"Universal-Assets nur als PNG. In App Store Connect kannst du „Use header asset in search results“ wählen."},
+  iNoBg:{ja:"背景画像がまだありません。ファイルを選ぶか、プレビューへドラッグしてください。", en:"No background image yet. Choose a file or drop one on the preview.", ko:"배경 이미지가 아직 없습니다. 파일을 선택하거나 미리보기에 끌어다 놓으세요.", de:"Noch kein Hintergrundbild. Wähle eine Datei oder ziehe sie auf die Vorschau."},
+  // status
+  sExporting:{ja:"書き出し中:{name}({w}×{h})", en:"Exporting {name} ({w}×{h})…", ko:"내보내는 중: {name} ({w}×{h})", de:"Exportiere {name} ({w}×{h}) …"},
+  sCancel:{ja:"保存をキャンセルしました。", en:"Save canceled.", ko:"저장을 취소했습니다.", de:"Speichern abgebrochen."},
+  sDoneN:{ja:"{n} 枚を書き出しました。", en:"Exported {n} images.", ko:"{n}장을 내보냈습니다.", de:"{n} Bilder exportiert."},
+  sDone:{ja:"書き出しました。", en:"Exported.", ko:"내보냈습니다.", de:"Exportiert."},
+  sFail:{ja:"書き出しに失敗しました。ブラウザのメモリが不足している可能性があります。別のブラウザか、サイズの小さい書き出し先で試してください。", en:"Export failed. Your browser may be out of memory. Try another browser or a smaller output.", ko:"내보내기에 실패했습니다. 브라우저 메모리가 부족할 수 있습니다. 다른 브라우저나 더 작은 크기로 시도해 보세요.", de:"Export fehlgeschlagen. Möglicherweise reicht der Speicher des Browsers nicht aus. Versuche einen anderen Browser oder eine kleinere Ausgabe."},
+  sBadImg:{ja:"画像を読み込めませんでした。PNG か JPEG を選んでください。", en:"Couldn’t load the image. Choose a PNG or JPEG.", ko:"이미지를 불러오지 못했습니다. PNG나 JPEG를 선택해 주세요.", de:"Bild konnte nicht geladen werden. Wähle eine PNG- oder JPEG-Datei."},
+  langAria:{ja:"言語", en:"Language", ko:"언어", de:"Sprache"},
+};
+const SAMPLE = {
+  ja:{title:"空模様を、ひと目で。", sub:"1時間ごとの雨雲レーダーとウィジェット"},
+  en:{title:"Your sky, at a glance.", sub:"Hourly rain radar and widgets"},
+  ko:{title:"하늘을 한눈에.", sub:"시간별 비구름 레이더와 위젯"},
+  de:{title:"Das Wetter auf einen Blick.", sub:"Stündliches Regenradar und Widgets"},
+};
+
 /* ---------- Specs ---------- */
 const PRESETS = [
-  {id:"header", group:"creative", name:"プロダクトページヘッダー", w:3840, h:1646, ratio:"21:9", safe:[1097,493,1646,661], formats:["png","jpg"],
-   note:"ページ最上部に表示。API は PNG のみ受け付けるため PNG 推奨。動画なら 5〜30 秒。"},
-  {id:"search", group:"creative", name:"検索結果アセット", w:3840, h:2560, ratio:"3:2", safe:[836,765,2168,1030], formats:["png","jpg"],
-   note:"検索結果でスクリーンショットの代わりに表示。1920×1280〜3840×2560 の範囲で可。"},
-  {id:"universal", group:"creative", name:"ユニバーサル", w:5244, h:2950, ratio:"16:9", safe:[1921,660,1402,962], formats:["png"],
-   note:"1 枚でヘッダーと検索結果の両方に使える。PNG のみ。"},
-  {id:"eventCard", group:"event", name:"イベントカード", w:1920, h:1080, ratio:"16:9", formats:["png","jpg"],
-   note:"App内イベントのカード。1920×1080〜3840×2160。"},
-  {id:"eventDetail", group:"event", name:"イベント詳細", w:1080, h:1920, ratio:"9:16", formats:["png","jpg"],
-   note:"App内イベントの詳細ページ。1080×1920〜2160×3840。"},
-  {id:"duoOuterP", group:"duo", name:"外側・縦", w:1398, h:2034, ratio:"約 2:3", formats:["png","jpg"],
-   note:"iPhone Duo 外側ディスプレイ。2027年4月以降の提出で必須。"},
-  {id:"duoOuterL", group:"duo", name:"外側・横", w:2034, h:1398, ratio:"約 3:2", formats:["png","jpg"], note:"外側ディスプレイの横向き。"},
-  {id:"duoInnerL", group:"duo", name:"内側・横", w:2853, h:2007, ratio:"約 √2:1", formats:["png","jpg"], note:"内側 7.6 インチ。開いたときの自然な向き。"},
-  {id:"duoInnerP", group:"duo", name:"内側・縦", w:2007, h:2853, ratio:"約 1:√2", formats:["png","jpg"], note:"内側ディスプレイの縦向き。"},
+  {id:"header", group:"creative", w:3840, h:1646, ratio:"21:9", safe:[1097,493,1646,661], formats:["png","jpg"],
+   name:{ja:"プロダクトページヘッダー", en:"Product page header", ko:"제품 페이지 헤더", de:"Produktseiten-Header"},
+   note:{ja:"ページ最上部に表示。API は PNG のみ受け付けるため PNG 推奨。動画なら 5〜30 秒。", en:"Shown at the top of the product page. PNG recommended, because the API accepts PNG only. Video: 5–30 seconds.", ko:"제품 페이지 맨 위에 표시됩니다. API는 PNG만 받으므로 PNG를 권장합니다. 동영상은 5~30초.", de:"Erscheint ganz oben auf der Produktseite. PNG empfohlen, da die API nur PNG annimmt. Video: 5–30 Sekunden."}},
+  {id:"search", group:"creative", w:3840, h:2560, ratio:"3:2", safe:[836,765,2168,1030], formats:["png","jpg"],
+   name:{ja:"検索結果アセット", en:"Search results asset", ko:"검색 결과 에셋", de:"Suchergebnis-Asset"},
+   note:{ja:"検索結果でスクリーンショットの代わりに表示。1920×1280〜3840×2560 の範囲で可。", en:"Replaces the screenshots in search results. Any size from 1920×1280 to 3840×2560.", ko:"검색 결과에서 스크린샷 대신 표시됩니다. 1920×1280~3840×2560 범위에서 가능합니다.", de:"Ersetzt in den Suchergebnissen die Screenshots. Jede Größe von 1920×1280 bis 3840×2560."}},
+  {id:"universal", group:"creative", w:5244, h:2950, ratio:"16:9", safe:[1921,660,1402,962], formats:["png"],
+   name:{ja:"ユニバーサル", en:"Universal", ko:"유니버설", de:"Universal"},
+   note:{ja:"1 枚でヘッダーと検索結果の両方に使える。PNG のみ。", en:"One file for both the header and search results. PNG only.", ko:"한 장으로 헤더와 검색 결과 모두에 사용할 수 있습니다. PNG만 가능.", de:"Eine Datei für Header und Suchergebnisse. Nur PNG."}},
+  {id:"eventCard", group:"event", w:1920, h:1080, ratio:"16:9", formats:["png","jpg"],
+   name:{ja:"イベントカード", en:"Event card", ko:"이벤트 카드", de:"Event-Karte"},
+   note:{ja:"App内イベントのカード。1920×1080〜3840×2160。", en:"Card for an in-app event. 1920×1080 to 3840×2160.", ko:"앱 내 이벤트 카드. 1920×1080~3840×2160.", de:"Karte für ein In-App-Event. 1920×1080 bis 3840×2160."}},
+  {id:"eventDetail", group:"event", w:1080, h:1920, ratio:"9:16", formats:["png","jpg"],
+   name:{ja:"イベント詳細", en:"Event details", ko:"이벤트 상세", de:"Event-Details"},
+   note:{ja:"App内イベントの詳細ページ。1080×1920〜2160×3840。", en:"Details page of an in-app event. 1080×1920 to 2160×3840.", ko:"앱 내 이벤트 상세 페이지. 1080×1920~2160×3840.", de:"Detailseite eines In-App-Events. 1080×1920 bis 2160×3840."}},
+  {id:"duoOuterP", group:"duo", w:1398, h:2034, ratio:"2:3", approx:true, formats:["png","jpg"],
+   name:{ja:"外側・縦", en:"Outer, portrait", ko:"외부·세로", de:"Außen, Hochformat"},
+   note:{ja:"iPhone Duo 外側ディスプレイ。2027年4月以降の提出で必須。", en:"iPhone Duo outer display. Required for submissions from April 2027.", ko:"iPhone Duo 외부 디스플레이. 2027년 4월부터 제출 시 필수.", de:"Außendisplay des iPhone Duo. Ab April 2027 bei Einreichungen erforderlich."}},
+  {id:"duoOuterL", group:"duo", w:2034, h:1398, ratio:"3:2", approx:true, formats:["png","jpg"],
+   name:{ja:"外側・横", en:"Outer, landscape", ko:"외부·가로", de:"Außen, Querformat"},
+   note:{ja:"外側ディスプレイの横向き。", en:"Outer display in landscape.", ko:"외부 디스플레이 가로 방향.", de:"Außendisplay im Querformat."}},
+  {id:"duoInnerL", group:"duo", w:2853, h:2007, ratio:"√2:1", approx:true, formats:["png","jpg"],
+   name:{ja:"内側・横", en:"Inner, landscape", ko:"내부·가로", de:"Innen, Querformat"},
+   note:{ja:"内側 7.6 インチ。開いたときの自然な向き。", en:"Inner 7.6-inch display. Its natural orientation when open.", ko:"내부 7.6인치. 펼쳤을 때의 기본 방향.", de:"Innendisplay mit 7,6 Zoll. Die natürliche Ausrichtung im aufgeklappten Zustand."}},
+  {id:"duoInnerP", group:"duo", w:2007, h:2853, ratio:"1:√2", approx:true, formats:["png","jpg"],
+   name:{ja:"内側・縦", en:"Inner, portrait", ko:"내부·세로", de:"Innen, Hochformat"},
+   note:{ja:"内側ディスプレイの縦向き。", en:"Inner display in portrait.", ko:"내부 디스플레이 세로 방향.", de:"Innendisplay im Hochformat."}},
 ];
-const GROUPS = {creative:"クリエイティブアセット(iOS 27〜)", event:"App内イベント", duo:"iPhone Duo スクリーンショット"};
+const GROUPS = {
+  creative:{ja:"クリエイティブアセット(iOS 27〜)", en:"Creative assets (iOS 27+)", ko:"크리에이티브 에셋 (iOS 27+)", de:"Creative Assets (ab iOS 27)"},
+  event:{ja:"App内イベント", en:"In-app events", ko:"앱 내 이벤트", de:"In-App-Events"},
+  duo:{ja:"iPhone Duo スクリーンショット", en:"iPhone Duo screenshots", ko:"iPhone Duo 스크린샷", de:"iPhone Duo-Screenshots"},
+};
+const ratioText = p => (p.approx ? tr(UI.approx) : "") + p.ratio;
 const FONTS = {
   zen:{fam:'"Zen Kaku Gothic New"', t:900, s:500},
   rounded:{fam:'"M PLUS Rounded 1c"', t:800, s:500},
   serif:{fam:'"Noto Serif JP"', t:700, s:500},
   dela:{fam:'"Dela Gothic One"', t:400, s:500, subFam:'"Zen Kaku Gothic New"'},
 };
-const FALLBACK = ',"Hiragino Sans","Yu Gothic",sans-serif';
+const FALLBACK = ',"Noto Sans KR","Hiragino Sans","Apple SD Gothic Neo","Yu Gothic",sans-serif';
+const UI_FONT = '"IBM Plex Sans JP","Noto Sans KR",sans-serif';
 
 /* ---------- State ---------- */
 const DEFAULTS = {
-  preset:"header", title:"空模様を、ひと目で。", sub:"1時間ごとの雨雲レーダーとウィジェット",
+  preset:"header", title:SAMPLE[lang].title, sub:SAMPLE[lang].sub,
   font:"zen", textColor:"#FFFFFF", titleScale:1, align:"center",
   bgMode:"gradient", c1:"#14235E", c2:"#4F8FE8", angle:120, imgScale:1, imgX:0.5, imgY:0.5, dim:0,
   iconLayout:"stack", showSafe:true,
@@ -270,31 +391,57 @@ const images = {bg:null, icon:null, shot:null};
 try { const saved = JSON.parse(localStorage.getItem("assetpress:v1")||"null"); if (saved) Object.assign(state, saved); } catch(e) {}
 const persist = () => { try { localStorage.setItem("assetpress:v1", JSON.stringify(state)); } catch(e) {} };
 const presetOf = id => PRESETS.find(p => p.id === id) || PRESETS[0];
+const isSample = (k, v) => Object.values(SAMPLE).some(s => s[k] === v);
+if (isSample("title", state.title)) state.title = SAMPLE[lang].title;
+if (isSample("sub", state.sub)) state.sub = SAMPLE[lang].sub;
 
 /* ---------- DOM ---------- */
 const $ = id => document.getElementById(id);
 const canvas = $("preview"), pctx = canvas.getContext("2d");
 
+function applyStatic(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el => { const v = UI[el.dataset.i18n]; if (v) el.textContent = tr(v); });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el => { const v = UI[el.dataset.i18nAria]; if (v) el.setAttribute("aria-label", tr(v)); });
+  document.querySelectorAll("a[data-keep-lang]").forEach(a => { const base = a.getAttribute("href").split("?")[0]; a.setAttribute("href", `${base}?lang=${lang}`); });
+  $("langSel").setAttribute("aria-label", tr(UI.langAria));
+}
+
+function buildLangSel(){
+  const sel = $("langSel");
+  for (const [k, v] of Object.entries(LANGS)){ const o = document.createElement("option"); o.value = k; o.textContent = v; sel.appendChild(o); }
+  sel.value = lang;
+  sel.addEventListener("change", () => {
+    const prev = lang; lang = sel.value;
+    try { localStorage.setItem("unfoldkit:lang", lang); } catch(e) {}
+    try { const u = new URL(location.href); u.searchParams.set("lang", lang); history.replaceState(null, "", u); } catch(e) {}
+    if (state.title === SAMPLE[prev].title) state.title = SAMPLE[lang].title;
+    if (state.sub === SAMPLE[prev].sub) state.sub = SAMPLE[lang].sub;
+    persist(); applyStatic(); buildPresetList(); syncForm(); schedule();
+  });
+}
+
 function buildPresetList(){
-  const host = $("presets");
+  const host = $("presets"); host.textContent = "";
   for (const g of Object.keys(GROUPS)){
     const wrap = document.createElement("div"); wrap.className = "pgroup";
-    const l = document.createElement("span"); l.className = "lbl"; l.textContent = GROUPS[g]; wrap.appendChild(l);
+    const l = document.createElement("span"); l.className = "lbl"; l.textContent = tr(GROUPS[g]); wrap.appendChild(l);
     for (const p of PRESETS.filter(x => x.group === g)){
       const lab = document.createElement("label"); lab.className = "preset";
       lab.innerHTML = `<input type="radio" name="preset" value="${p.id}"><span></span><span class="px">${p.w}×${p.h}</span>`;
-      lab.children[1].textContent = p.name;
+      lab.children[1].textContent = tr(p.name);
       wrap.appendChild(lab);
     }
     host.appendChild(wrap);
   }
-  const rows = $("specRows");
+  const rows = $("specRows"); rows.textContent = "";
   for (const p of PRESETS){
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td></td><td class="px">${p.w} × ${p.h}</td><td>${p.ratio}</td><td></td>`;
-    tr.children[0].textContent = `${GROUPS[p.group].replace(/(.*)/, "$1")}:${p.name}`;
-    tr.children[3].textContent = p.note + (p.formats.length === 1 ? "" : " 形式: PNG / JPEG。");
-    rows.appendChild(tr);
+    const tr_ = document.createElement("tr");
+    tr_.innerHTML = `<td></td><td class="px">${p.w} × ${p.h}</td><td></td><td></td>`;
+    tr_.children[0].textContent = `${tr(GROUPS[p.group])}: ${tr(p.name)}`;
+    tr_.children[2].textContent = ratioText(p);
+    tr_.children[3].textContent = tr(p.note) + (p.formats.length === 1 ? "" : tr(UI.formats));
+    rows.appendChild(tr_);
   }
 }
 
@@ -319,9 +466,9 @@ function syncVisibility(){
   $("shotClear").hidden = !images.shot;
   $("shotWrap").style.opacity = p.group === "duo" ? 1 : .55;
   $("exportJpg").hidden = !p.formats.includes("jpg");
-  $("dropHint").textContent = p.group === "duo" ? "画像をプレビューにドラッグするとアプリの画面になります" : "画像をプレビューにドラッグすると背景になります";
+  $("dropHint").textContent = tr(p.group === "duo" ? UI.dropShot : UI.dropBg);
   $("dimLabel").textContent = `${p.w} × ${p.h} px`;
-  $("ratioLabel").textContent = p.ratio;
+  $("ratioLabel").textContent = ratioText(p);
 }
 
 /* ---------- Drawing ---------- */
@@ -332,6 +479,8 @@ function rr(ctx, x, y, w, h, r){
   ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath();
 }
 
+// Japanese/Chinese characters can break anywhere; Latin, German and Korean break at spaces.
+const NO_SPACE_SCRIPT = /[　-ヿ㐀-鿿＀-￯]/;
 function wrapText(ctx, text, maxW){
   const out = [];
   for (const para of String(text).split("\n")){
@@ -341,13 +490,14 @@ function wrapText(ctx, text, maxW){
       if (line && ctx.measureText(test).width > maxW){
         let next = ch;
         const sp = line.lastIndexOf(" ");
-        // 読点・句点・助詞の後ろなど、自然な位置まで戻って改行する
         let jp = -1;
         for (let i = line.length - 1; i >= Math.max(1, line.length - 9); i--){
           if (/[、。・！？!?」』）]/.test(line[i])) { jp = i + 1; break; }
         }
-        if (sp > 0 && /^[\x21-\x7E]+$/.test(line.slice(sp+1) + ch)){ next = line.slice(sp+1) + ch; line = line.slice(0, sp); }
+        const tail = line.slice(sp + 1) + ch;
+        if (sp > 0 && !NO_SPACE_SCRIPT.test(tail)){ next = tail; line = line.slice(0, sp); }
         else if (jp > 0 && jp < line.length){ next = line.slice(jp) + ch; line = line.slice(0, jp); }
+        else if (!NO_SPACE_SCRIPT.test(ch) && /\S/.test(ch) && /\S$/.test(line)) wrapText.brokeWord = true;
         // 禁則: 行頭に句読点・閉じ括弧を置かない(ぶら下げ)
         while (next && /^[、。,.，．・」』）)！？!?ーっゃゅょ]/.test(next)){ line += next[0]; next = next.slice(1); }
         out.push(line.trimEnd()); line = next.trimStart();
@@ -364,6 +514,7 @@ function fitText(ctx, title, sub, maxW, maxH, base){
   let size = base, res;
   for (let k = 0; k < 60; k++){
     ctx.font = `${F.t} ${size}px ${fam}`;
+    wrapText.brokeWord = false;
     const tl = title.trim() ? wrapText(ctx, title.trim(), maxW) : [];
     const ss = title.trim() ? size * 0.4 : size * 0.6;
     ctx.font = `${F.s} ${ss}px ${subFam}`;
@@ -371,10 +522,13 @@ function fitText(ctx, title, sub, maxW, maxH, base){
     const lh = size * 1.2, lhs = ss * 1.5, gap = (tl.length && sl.length) ? size * 0.32 : 0;
     const h = tl.length * lh + gap + sl.length * lhs;
     res = {size, ss, tl, sl, lh, lhs, gap, h, fam, subFam, F};
-    if ((h <= maxH && tl.length <= 3 && sl.length <= 3) || size < 6) break;
+    let tooWide = false;
+    ctx.font = `${F.t} ${size}px ${fam}`; tl.forEach(l => { if (ctx.measureText(l).width > maxW * 1.01) tooWide = true; });
+    // A word split mid-way (long German compounds) is a last resort: shrink first.
+    const brokeOk = !wrapText.brokeWord || size < base * 0.45;
+    if ((h <= maxH && tl.length <= 3 && sl.length <= 3 && !tooWide && brokeOk) || size < 6) break;
     size *= 0.95;
   }
-  // 実際の最大行幅
   let mw = 0;
   ctx.font = `${res.F.t} ${res.size}px ${res.fam}`; res.tl.forEach(l => mw = Math.max(mw, ctx.measureText(l).width));
   ctx.font = `${res.F.s} ${res.ss}px ${res.subFam}`; res.sl.forEach(l => mw = Math.max(mw, ctx.measureText(l).width));
@@ -443,7 +597,6 @@ function drawScreenshot(ctx, P, s){
   let cap, area;
   if (land){ cap = [m, m, W * 0.34 - m, H - 2*m]; area = [W * 0.34 + m * 0.5, m, W * 0.66 - m * 1.5, H - 2*m]; }
   else { cap = [m, m * 1.1, W - 2*m, H * 0.17]; area = [m * 1.2, m * 1.1 + H * 0.17 + m * 0.9, W - 2.4*m, 0]; area[3] = H - area[1] - m * 0.8; }
-  // caption
   let cy = cap[1], ch = cap[3];
   if (images.icon){
     const isz = land ? Math.min(cap[2], cap[3]) * 0.22 : cap[3] * 0.42;
@@ -455,7 +608,6 @@ function drawScreenshot(ctx, P, s){
   const t = fitText(ctx, state.title, state.sub, cap[2], ch, base);
   const ty = land ? (images.icon ? cy : cap[1] + (cap[3] - t.h) / 2) : cy + (ch - t.h) / 2;
   drawTextBlock(ctx, t, cap[0], ty, cap[2], land ? "left" : state.align);
-  // app screen
   const ratio = images.shot ? images.shot.width / images.shot.height : P.w / P.h;
   let dw = area[2], dh = dw / ratio;
   if (dh > area[3]){ dh = area[3]; dw = dh * ratio; }
@@ -473,8 +625,8 @@ function drawScreenshot(ctx, P, s){
     const pad = dw * 0.07;
     for (let i = 0; i < 5; i++) { rr(ctx, dx + pad, dy + pad + i * dh * 0.14, dw - 2*pad, dh * 0.1, dw * 0.02); ctx.fill(); }
     ctx.fillStyle = "#5A6379"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.font = `600 ${Math.max(10, dw * 0.045)}px "IBM Plex Sans JP",sans-serif`;
-    ctx.fillText("アプリの画面をここに入れる", dx + dw / 2, dy + dh * 0.92);
+    ctx.font = `600 ${Math.max(10, dw * 0.045)}px ${UI_FONT}`;
+    ctx.fillText(tr(UI.placeholder), dx + dw / 2, dy + dh * 0.92, dw * 0.9);
   }
   ctx.restore();
 }
@@ -487,9 +639,9 @@ function drawSafe(ctx, P, s){
   ctx.setLineDash([Math.max(4, W * .004), Math.max(3, W * .003)]);
   ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.lineWidth = Math.max(1, W * .0012); ctx.strokeRect(x, y, w, h);
   ctx.setLineDash([]);
-  ctx.fillStyle = "rgba(255,255,255,.92)"; ctx.font = `600 ${Math.max(10, W * .011)}px "IBM Plex Sans JP",sans-serif`;
+  ctx.fillStyle = "rgba(255,255,255,.92)"; ctx.font = `600 ${Math.max(10, W * .011)}px ${UI_FONT}`;
   ctx.textAlign = "left"; ctx.textBaseline = "bottom";
-  ctx.fillText(`セーフエリア ${P.safe[2]}×${P.safe[3]}(どの端末でも切れない範囲)`, x, y - W * .004);
+  ctx.fillText(fmt(UI.safeLabel, {w:P.safe[2], h:P.safe[3]}), x, y - W * .004);
   ctx.restore();
 }
 
@@ -502,15 +654,15 @@ function render(ctx, P, s, overlay){
   if (overlay && P.safe && state.showSafe) drawSafe(ctx, P, s);
 }
 
-let fontsReady = Promise.resolve();
 function loadFonts(){
-  const F = FONTS[state.font] || FONTS.zen, txt = (state.title + state.sub) || "あ";
-  fontsReady = Promise.all([
+  const F = FONTS[state.font] || FONTS.zen, txt = (state.title + state.sub) || "A";
+  return Promise.all([
     document.fonts.load(`${F.t} 64px ${F.fam}`, txt),
     document.fonts.load(`${F.s} 32px ${F.subFam || F.fam}`, txt),
-    document.fonts.load(`600 20px "IBM Plex Sans JP"`, "セーフエリアアプリの画面をここに入れる"),
+    document.fonts.load(`900 64px "Noto Sans KR"`, txt),
+    document.fonts.load(`500 32px "Noto Sans KR"`, txt),
+    document.fonts.load(`600 20px "IBM Plex Sans JP"`, tr(UI.safeLabel) + tr(UI.placeholder)),
   ]).catch(() => {});
-  return fontsReady;
 }
 
 let raf = 0;
@@ -536,28 +688,28 @@ function schedule(){
 function renderChecks(){
   const P = presetOf(state.preset), text = `${state.title}\n${state.sub}`, list = [];
   const add = (level, t) => list.push([level, t]);
-  add("ok", `${P.w}×${P.h}px ちょうどで書き出します。`);
-  add("ok", "PNG はアルファチャンネルなし(RGB)で書き出します。Apple は透過・アルファを含む画像を受け付けません。");
-  if (P.safe) add("ok", "文字とアイコンはセーフエリアの中に自動で収めています。");
-  if (/[¥$€£]\s?\d|\d[\d,]*\s?(円|ドル)|\d+\s?[%％]\s?(off|オフ)?|割引|半額|セール|sale\b|無料|free\b/i.test(text))
-    add("warn", "価格・割引・「無料」などの表記があります。Apple は素材に価格や割引を入れないよう求めています。");
-  if (/https?:\/\/|www\.|\.(com|jp|net|io|app)\b/i.test(text)) add("warn", "URL が含まれています。素材に Web サイトの URL は入れられません。");
-  if (/©|\(c\)|copyright/i.test(text)) add("warn", "著作権記号は入れないよう求められています。");
-  if (/editor'?s\s?choice|app of the day|game of the day|apple design award|エディターズ\s?チョイス|今日の\s?(app|アプリ|ゲーム)/i.test(text))
-    add("warn", "Apple の表彰(Editor's Choice、今日の App など)の表記は使えません。");
-  if (/no\.?\s?1\b|#1\b|ナンバー\s?ワン|1\s?位|ランキング|受賞|award/i.test(text))
-    add("warn", "ランキングや受賞の表記は、事実で確認できる場合のみ。Apple 広告に流用する場合は使えません。");
-  if (/android|google play|play store|galaxy|windows/i.test(text)) add("warn", "他のプラットフォームやストアの名前は入れられません。");
-  if (P.group === "creative" && [...state.title.replace(/\s/g, "")].length > 22) add("info", "見出しが長めです。Apple は「ビジュアルを補う短いフレーズ」を推奨しています。");
-  if (P.group === "event" && state.title.trim()) add("info", "App内イベントの画像には、できるだけ文字やロゴを入れないよう推奨されています(イベント名はカードに別途表示されます)。");
-  if (P.group === "duo"){
-    if (!images.shot) add("warn", "アプリの画面が入っていません。審査では「アプリ使用中の画面」が過半数のスクリーンショットに必要です。");
-    else if (Math.abs(images.shot.width / images.shot.height - P.w / P.h) > 0.04) add("info", `入れた画面の比率(${images.shot.width}×${images.shot.height})がこの書き出し先と違います。同じ向きのディスプレイで撮った画面が最適です。`);
-    else add("ok", "アプリの画面が入っています。");
+  add("ok", fmt(UI.cSize, {w:P.w, h:P.h}));
+  add("ok", tr(UI.cAlpha));
+  if (P.safe) add("ok", tr(UI.cSafe));
+  if (/[¥$€£₩]\s?\d|\d[\d,.]*\s?(円|ドル|원|€|euro)|\d+\s?[%％]\s?(off|オフ)?|割引|半額|セール|sale\b|無料|free\b|kostenlos|gratis|rabatt|reduziert|angebot|무료|할인|세일|특가/i.test(text)) add("warn", tr(UI.wPrice));
+  if (/https?:\/\/|www\.|\.(com|jp|net|io|app|de|kr)\b/i.test(text)) add("warn", tr(UI.wUrl));
+  if (/©|\(c\)|copyright/i.test(text)) add("warn", tr(UI.wCopy));
+  if (/editor'?s\s?choice|app of the day|game of the day|apple design award|エディターズ\s?チョイス|今日の\s?(app|アプリ|ゲーム)|app des tages|spiel des tages|오늘의\s?(앱|게임)|에디터(스)?\s?(의\s?)?(선택|초이스)/i.test(text)) add("warn", tr(UI.wApple));
+  if (/no\.?\s?1\b|nr\.?\s?1\b|#1\b|platz\s?1\b|ナンバー\s?ワン|1\s?位|1\s?위|ランキング|순위|受賞|수상|award|auszeichnung|preisgekrönt/i.test(text)) add("warn", tr(UI.wRank));
+  if (/android|google play|play store|galaxy|windows/i.test(text)) add("warn", tr(UI.wPlatform));
+  if (P.group === "creative"){
+    const cjk = /[぀-ヿ㐀-鿿가-힯]/.test(state.title);
+    if ([...state.title.replace(/\s/g, "")].length > (cjk ? 22 : 40)) add("info", tr(UI.iLong));
   }
-  if (P.group === "creative") add("info", "クリエイティブアセットは iOS 27 / iPadOS 27 以降の App Store に表示されます。言語ごとに用意できます。");
-  if (P.id === "universal") add("info", "ユニバーサルは PNG のみ。App Store Connect で「ヘッダーアセットを検索結果にも使う」を選べます。");
-  if (state.bgMode === "image" && !images.bg) add("info", "背景画像がまだありません。ファイルを選ぶか、プレビューへドラッグしてください。");
+  if (P.group === "event" && state.title.trim()) add("info", tr(UI.iEvent));
+  if (P.group === "duo"){
+    if (!images.shot) add("warn", tr(UI.wNoShot));
+    else if (Math.abs(images.shot.width / images.shot.height - P.w / P.h) > 0.04) add("info", fmt(UI.iRatio, {w:images.shot.width, h:images.shot.height}));
+    else add("ok", tr(UI.cShot));
+  }
+  if (P.group === "creative") add("info", tr(UI.iCreative));
+  if (P.id === "universal") add("info", tr(UI.iUniversal));
+  if (state.bgMode === "image" && !images.bg) add("info", tr(UI.iNoBg));
   const ul = $("checks"); ul.textContent = "";
   for (const [lv, t] of list){ const li = document.createElement("li"); li.className = lv; li.textContent = t; ul.appendChild(li); }
 }
@@ -611,30 +763,30 @@ async function saveFile(name, blob){
 }
 const slug = () => (state.title.match(/[A-Za-z0-9]+/g) || ["asset"]).join("-").toLowerCase().slice(0, 24) || "asset";
 
-async function exportPreset(P, fmt){
+async function exportPreset(P, kind){
   await loadFonts();
   const off = document.createElement("canvas"); off.width = P.w; off.height = P.h;
   const ctx = off.getContext("2d");
   render(ctx, P, 1, false);
-  const blob = fmt === "jpg" ? await new Promise(r => off.toBlob(r, "image/jpeg", 0.92)) : await encodePngRGB(off);
+  const blob = kind === "jpg" ? await new Promise(r => off.toBlob(r, "image/jpeg", 0.92)) : await encodePngRGB(off);
   off.width = off.height = 1;
-  return saveFile(`${slug()}-${P.id}-${P.w}x${P.h}.${fmt === "jpg" ? "jpg" : "png"}`, blob);
+  return saveFile(`${slug()}-${P.id}-${P.w}x${P.h}.${kind === "jpg" ? "jpg" : "png"}`, blob);
 }
 
-async function runExport(list, fmt){
+async function runExport(list, kind){
   const btns = ["exportPng","exportJpg","exportTrio"].map($); btns.forEach(b => b.disabled = true);
   const st = $("status");
   try {
     let done = 0;
     for (const P of list){
-      st.textContent = `書き出し中:${P.name}(${P.w}×${P.h})`;
-      const r = await exportPreset(P, fmt);
-      if (r === "declined"){ st.textContent = "保存をキャンセルしました。"; return; }
+      st.textContent = fmt(UI.sExporting, {name:tr(P.name), w:P.w, h:P.h});
+      const r = await exportPreset(P, kind);
+      if (r === "declined"){ st.textContent = tr(UI.sCancel); return; }
       done++;
     }
-    st.textContent = done > 1 ? `${done} 枚を書き出しました。` : "書き出しました。";
+    st.textContent = done > 1 ? fmt(UI.sDoneN, {n:done}) : tr(UI.sDone);
   } catch(e){
-    st.textContent = "書き出しに失敗しました。ブラウザのメモリが不足している可能性があります。別のブラウザか、サイズの小さい書き出し先で試してください。";
+    st.textContent = tr(UI.sFail);
   } finally { btns.forEach(b => b.disabled = false); }
 }
 
@@ -651,7 +803,7 @@ async function setImage(kind, file){
     images[kind] = await loadImage(file);
     if (kind === "bg"){ state.bgMode = "image"; if (state.dim === 0) state.dim = 0.25; syncForm(); }
     syncVisibility(); schedule(); persist();
-  } catch(e){ $("status").textContent = "画像を読み込めませんでした。PNG か JPEG を選んでください。"; }
+  } catch(e){ $("status").textContent = tr(UI.sBadImg); }
 }
 
 /* ---------- Events ---------- */
@@ -681,7 +833,7 @@ function bind(){
   window.addEventListener("resize", schedule);
 }
 
-buildPresetList(); syncForm(); bind(); schedule();
+buildLangSel(); applyStatic(); buildPresetList(); syncForm(); bind(); schedule();
 })();
 </script>
 </body>

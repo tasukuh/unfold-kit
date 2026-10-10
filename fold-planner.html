@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fold Planner</title>
-<meta name="description" content="アプリの種類を選ぶと、iPhone Duo の外側・内側・半開きなど6つのポーズでの推奨レイアウトと、実装チェックリストを提案する無料ツール。">
+<meta name="description" content="Pick your app's category and see recommended iPhone Duo layouts for six poses, closed, open and half-folded, plus an implementation checklist. Free, in English, Japanese, Korean and German.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+JP:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+JP:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
 <style>
 /* Layout: an input band (what kind of app) → summary → six device poses drawn at one true scale → checklist → reference. */
 :root{
@@ -16,8 +16,8 @@
   --fold:#D98A1C; --fold-soft:#F7E3C4;
   --screen:#FBFCFE; --wire:#C9D0DE; --wire-2:#E6EAF2; --dark:#1D2337; --map:#E4EEDF; --road:#FFFFFF;
   --ok:#1E7A4C;
-  --f-display:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
-  --f-body:"IBM Plex Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-display:"Zen Kaku Gothic New","Noto Sans KR","Hiragino Sans","Apple SD Gothic Neo","Yu Gothic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans JP","Noto Sans KR","Hiragino Sans","Apple SD Gothic Neo","Yu Gothic",system-ui,sans-serif;
   --f-data:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
   color-scheme:light;
 }
@@ -42,10 +42,11 @@ a{color:var(--accent)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .wrap{max-width:1180px;margin:0 auto}
 
-.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;padding-block:20px 16px;border-bottom:1px solid var(--rule);margin-bottom:24px}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;padding-block:20px 16px;border-bottom:1px solid var(--rule);margin-bottom:24px}
 .brand{font-family:var(--f-display);font-weight:900;font-size:22px;margin:0}
 .brand small{font-weight:500;font-size:13px;color:var(--ink-2);margin-left:10px;display:inline-block}
-.top nav{margin-left:auto;display:flex;gap:16px;font-size:13px}
+.top nav{margin-left:auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-size:13px}
+.lang{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:4px 8px}
 
 h2{font-family:var(--f-display);font-weight:700;font-size:19px;margin:0 0 4px;text-wrap:balance}
 .lead{color:var(--ink-2);margin:0 0 14px;max-width:70ch}
@@ -81,7 +82,7 @@ h2{font-family:var(--f-display);font-weight:700;font-size:19px;margin:0 0 4px;te
 .pose .pn{font-weight:600;font-size:14px}
 .pose .ps{font-family:var(--f-data);font-size:11.5px;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .pose .pnote{font-size:13px;color:var(--ink);line-height:1.55}
-.pose.best .pn::after{content:"おすすめ";font-family:var(--f-body);font-size:11px;font-weight:600;color:var(--accent-ink);background:var(--accent);border-radius:4px;padding:1px 6px;margin-left:8px;vertical-align:2px}
+.pose.best .pn::after{content:attr(data-badge);font-family:var(--f-body);font-size:11px;font-weight:600;color:var(--accent-ink);background:var(--accent);border-radius:4px;padding:1px 6px;margin-left:8px;vertical-align:2px}
 
 .checklist{display:grid;gap:22px;margin-bottom:40px}
 .cl-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:10px}
@@ -131,21 +132,22 @@ footer{margin-top:32px;font-size:12px;color:var(--ink-2);display:grid;gap:4px;ma
 <body>
 <div class="wrap">
 <header class="top">
-  <h1 class="brand">Fold Planner<small>iPhone Duo レイアウト提案</small></h1>
-  <nav><!--repo-only--><a href="/">Unfold Kit</a><a href="/asset-press">Asset Press</a><!--/repo-only--><a href="#checklist">チェックリスト</a><a href="#specs">仕様</a></nav>
+  <h1 class="brand">Fold Planner<small data-i18n="toolSub">iPhone Duo レイアウト提案</small></h1>
+  <nav><!--repo-only--><a href="/" data-keep-lang>Unfold Kit</a><a href="/asset-press" data-keep-lang>Asset Press</a><!--/repo-only--><a href="#checklist" data-i18n="navChecklist">チェックリスト</a><a href="#specs" data-i18n="navSpecs">仕様</a>
+    <select id="langSel" class="lang" aria-label="Language"></select></nav>
 </header>
 
 <section class="intro">
   <div class="box">
-    <h2>あなたのアプリについて</h2>
-    <p class="lead">種類を選ぶと、閉じた状態・開いた状態・半開きなど 6 つのポーズでの推奨レイアウトと、やることリストが下に出ます。</p>
-    <span class="lbl" id="catLbl">アプリの種類</span>
+    <h2 data-i18n="aboutH">あなたのアプリについて</h2>
+    <p class="lead" data-i18n="aboutLead">種類を選ぶと、閉じた状態・開いた状態・半開きなど 6 つのポーズでの推奨レイアウトと、やることリストが下に出ます。</p>
+    <span class="lbl" id="catLbl" data-i18n="catLbl">アプリの種類</span>
     <div class="cats" id="cats" role="radiogroup" aria-labelledby="catLbl"></div>
-    <span class="lbl">当てはまるもの</span>
+    <span class="lbl" data-i18n="modsLbl">当てはまるもの</span>
     <div class="mods" id="mods"></div>
   </div>
   <div class="box summary" aria-live="polite">
-    <h3 id="sumTitle">まず押さえる 3 点</h3>
+    <h3 id="sumTitle"></h3>
     <ol id="summary"></ol>
     <p class="best" id="best"></p>
   </div>
@@ -154,13 +156,13 @@ footer{margin-top:32px;font-size:12px;color:var(--ink-2);display:grid;gap:4px;ma
 <section>
   <div class="poses-head">
     <div>
-      <h2>6 つのポーズでの見え方</h2>
-      <p class="lead" style="margin:0">すべて同じ縮尺(ポイント単位)で描いています。内側ディスプレイのポイント値は App Store Connect のスクリーンショット寸法からの推定です。</p>
+      <h2 data-i18n="posesH">6 つのポーズでの見え方</h2>
+      <p class="lead" style="margin:0" data-i18n="posesLead">すべて同じ縮尺(ポイント単位)で描いています。内側ディスプレイのポイント値は App Store Connect のスクリーンショット寸法からの推定です。</p>
     </div>
     <div class="legend" aria-hidden="true">
-      <span><i style="background:var(--wire-2)"></i>システムのバー</span>
-      <span><i style="background:var(--fold-soft);outline:1px dashed var(--fold)"></i>折り目(予約領域)</span>
-      <span><i style="background:var(--accent)"></i>主な操作</span>
+      <span><i style="background:var(--wire-2)"></i><span data-i18n="lgBars">システムのバー</span></span>
+      <span><i style="background:var(--fold-soft);outline:1px dashed var(--fold)"></i><span data-i18n="lgFold">折り目(予約領域)</span></span>
+      <span><i style="background:var(--accent)"></i><span data-i18n="lgPrimary">主な操作</span></span>
     </div>
   </div>
   <div class="poses" id="poses"></div>
@@ -169,12 +171,12 @@ footer{margin-top:32px;font-size:12px;color:var(--ink-2);display:grid;gap:4px;ma
 <section class="checklist" id="checklist">
   <div class="cl-head">
     <div>
-      <h2>実装チェックリスト</h2>
-      <p class="lead" style="margin:0">チェックした状態はこのブラウザに保存されます。Markdown にしてチケットや README に貼れます。</p>
+      <h2 data-i18n="clH">実装チェックリスト</h2>
+      <p class="lead" style="margin:0" data-i18n="clLead">チェックした状態はこのブラウザに保存されます。Markdown にしてチケットや README に貼れます。</p>
     </div>
     <div class="cl-actions">
-      <button type="button" class="btn" id="copyMd">Markdown をコピー</button>
-      <button type="button" class="btn ghost" id="saveMd">.md で保存</button>
+      <button type="button" class="btn" id="copyMd" data-i18n="copyMd">Markdown をコピー</button>
+      <button type="button" class="btn ghost" id="saveMd" data-i18n="saveMd">.md で保存</button>
     </div>
   </div>
   <div class="status" id="status" role="status"></div>
@@ -182,21 +184,21 @@ footer{margin-top:32px;font-size:12px;color:var(--ink-2);display:grid;gap:4px;ma
 </section>
 
 <section class="box" id="specs">
-  <h2>iPhone Duo のディスプレイ</h2>
+  <h2 data-i18n="specsH">iPhone Duo のディスプレイ</h2>
   <div class="table-scroll"><table>
-    <thead><tr><th>ディスプレイ</th><th>パネル(px)</th><th>スクリーンショット(px)</th><th>ポイント(3x)</th><th>サイズクラス</th></tr></thead>
+    <thead><tr><th data-i18n="thDisplay">ディスプレイ</th><th data-i18n="thPanel">パネル(px)</th><th data-i18n="thShot">スクリーンショット(px)</th><th data-i18n="thPoints">ポイント(3x)</th><th data-i18n="thSize">サイズクラス</th></tr></thead>
     <tbody>
-      <tr><td>外側 5.4 インチ</td><td class="num">1398 × 2034</td><td class="num">1398 × 2034</td><td class="num">466 × 678</td><td>縦: 幅 Compact / 高さ Regular。横: どちらも Compact</td></tr>
-      <tr><td>内側 7.6 インチ</td><td class="num">1878 × 2670</td><td class="num">2007 × 2853</td><td class="num">669 × 951(推定)</td><td>縦横とも Regular。対応する向きの設定は無視される</td></tr>
-      <tr><td>参考: iPhone 18 Pro Max</td><td class="num">1320 × 2868</td><td class="num">1320 × 2868</td><td class="num">440 × 956</td><td>縦: 幅 Compact / 高さ Regular</td></tr>
+      <tr><td data-i18n="rOuter">外側 5.4 インチ</td><td class="num">1398 × 2034</td><td class="num">1398 × 2034</td><td class="num">466 × 678</td><td data-i18n="rOuterSc">縦: 幅 Compact / 高さ Regular。横: どちらも Compact</td></tr>
+      <tr><td data-i18n="rInner">内側 7.6 インチ</td><td class="num">1878 × 2670</td><td class="num">2007 × 2853</td><td class="num" data-i18n="rInnerPt">669 × 951(推定)</td><td data-i18n="rInnerSc">縦横とも Regular。対応する向きの設定は無視される</td></tr>
+      <tr><td data-i18n="rRef">参考: iPhone 18 Pro Max</td><td class="num">1320 × 2868</td><td class="num">1320 × 2868</td><td class="num">440 × 956</td><td data-i18n="rRefSc">縦: 幅 Compact / 高さ Regular</td></tr>
     </tbody>
   </table></div>
 </section>
 
 <footer>
-  <p>この提案は Apple の Human Interface Guidelines「Designing for iPhone Duo」と Tech Talk の内容をもとにした一般的なパターンです。最終的な確認は Xcode 27.1 の Device Hub(iPhone Duo シミュレーター)で行ってください。</p>
-  <p>出典: <a href="https://developer.apple.com/design/human-interface-guidelines/designing-for-iphone-duo" target="_blank" rel="noopener">Designing for iPhone Duo (HIG)</a> / <a href="https://developer.apple.com/documentation/technologyoverviews/preparing-your-app-for-iphone-duo" target="_blank" rel="noopener">Preparing your app for iPhone Duo</a> / <a href="https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications" target="_blank" rel="noopener">Screenshot specifications</a> / <a href="https://blakecrosley.com/blog/iphone-duo-for-developers" target="_blank" rel="noopener">iPhone Duo for Developers (Blake Crosley)</a></p>
-  <p>Apple、iPhone は Apple Inc. の商標です。このツールは Apple とは関係のない非公式ツールです。</p>
+  <p data-i18n="fNote">この提案は Apple の Human Interface Guidelines「Designing for iPhone Duo」と Tech Talk の内容をもとにした一般的なパターンです。最終的な確認は Xcode 27.1 の Device Hub(iPhone Duo シミュレーター)で行ってください。</p>
+  <p><span data-i18n="sources">出典</span>: <a href="https://developer.apple.com/design/human-interface-guidelines/designing-for-iphone-duo" target="_blank" rel="noopener">Designing for iPhone Duo (HIG)</a> / <a href="https://developer.apple.com/documentation/technologyoverviews/preparing-your-app-for-iphone-duo" target="_blank" rel="noopener">Preparing your app for iPhone Duo</a> / <a href="https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications" target="_blank" rel="noopener">Screenshot specifications</a> / <a href="https://blakecrosley.com/blog/iphone-duo-for-developers" target="_blank" rel="noopener">iPhone Duo for Developers (Blake Crosley)</a></p>
+  <p data-i18n="fTm">Apple、iPhone は Apple Inc. の商標です。このツールは Apple とは関係のない非公式ツールです。</p>
 </footer>
 </div>
 
@@ -205,142 +207,212 @@ footer{margin-top:32px;font-size:12px;color:var(--ink-2);display:grid;gap:4px;ma
 "use strict";
 const $ = id => document.getElementById(id);
 
+/* ---------- Language ---------- */
+const LANGS = {ja:"日本語", en:"English", ko:"한국어", de:"Deutsch"};
+function detectLang(){
+  try { const q = new URLSearchParams(location.search).get("lang"); if (q && LANGS[q]) return q; } catch(e) {}
+  try { const s = localStorage.getItem("unfoldkit:lang"); if (s && LANGS[s]) return s; } catch(e) {}
+  for (const l of (navigator.languages || [navigator.language || "en"])){ const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
+  return "en";
+}
+let lang = detectLang();
+const tr = v => v == null ? "" : (typeof v === "string" ? v : (v[lang] ?? v.en ?? v.ja));
+const fmt = (v, o) => tr(v).replace(/\{(\w+)\}/g, (_, k) => o[k]);
+
+const UI = {
+  toolSub:{ja:"iPhone Duo レイアウト提案", en:"iPhone Duo layout planner", ko:"iPhone Duo 레이아웃 플래너", de:"Layout-Planer für das iPhone Duo"},
+  navChecklist:{ja:"チェックリスト", en:"Checklist", ko:"체크리스트", de:"Checkliste"},
+  navSpecs:{ja:"仕様", en:"Specs", ko:"사양", de:"Technische Daten"},
+  aboutH:{ja:"あなたのアプリについて", en:"About your app", ko:"내 앱에 대해", de:"Deine App"},
+  aboutLead:{ja:"種類を選ぶと、閉じた状態・開いた状態・半開きなど 6 つのポーズでの推奨レイアウトと、やることリストが下に出ます。", en:"Pick a category to see recommended layouts for six poses, from closed to open to half-folded, plus a to-do list below.", ko:"종류를 고르면 닫힘·펼침·반쯤 접힘 등 6가지 자세에서의 추천 레이아웃과 할 일 목록이 아래에 나옵니다.", de:"Wähle eine Kategorie, um empfohlene Layouts für sechs Haltungen (zugeklappt, aufgeklappt, halb gefaltet) und darunter eine To-do-Liste zu sehen."},
+  catLbl:{ja:"アプリの種類", en:"App category", ko:"앱 종류", de:"App-Kategorie"},
+  modsLbl:{ja:"当てはまるもの", en:"What applies", ko:"해당하는 항목", de:"Was zutrifft"},
+  sumTitle:{ja:"{cat}アプリで、まず押さえる 3 点", en:"Start here: {cat}", ko:"먼저 챙길 3가지: {cat}", de:"Das Wichtigste zuerst: {cat}"},
+  best:{ja:"見せ場のポーズ:{pose}", en:"Showcase pose: {pose}", ko:"가장 돋보이는 자세: {pose}", de:"Stärkste Haltung: {pose}"},
+  badge:{ja:"おすすめ", en:"Best", ko:"추천", de:"Empfohlen"},
+  posesH:{ja:"6 つのポーズでの見え方", en:"How it looks in six poses", ko:"6가지 자세에서의 모습", de:"So sieht es in sechs Haltungen aus"},
+  posesLead:{ja:"すべて同じ縮尺(ポイント単位)で描いています。内側ディスプレイのポイント値は App Store Connect のスクリーンショット寸法からの推定です。", en:"Everything is drawn at the same scale, in points. Point sizes for the inner display are estimated from the App Store Connect screenshot dimensions.", ko:"모두 같은 축척(포인트 단위)으로 그렸습니다. 내부 디스플레이의 포인트 값은 App Store Connect 스크린샷 크기에서 추정한 값입니다.", de:"Alles ist im gleichen Maßstab in Punkten gezeichnet. Die Punktwerte des Innendisplays sind aus den Screenshot-Maßen in App Store Connect geschätzt."},
+  lgBars:{ja:"システムのバー", en:"System bars", ko:"시스템 바", de:"Systemleisten"},
+  lgFold:{ja:"折り目(予約領域)", en:"Fold (reserved region)", ko:"접힘 부분(예약 영역)", de:"Falz (reservierter Bereich)"},
+  lgPrimary:{ja:"主な操作", en:"Primary actions", ko:"주요 조작", de:"Hauptaktionen"},
+  clH:{ja:"実装チェックリスト", en:"Implementation checklist", ko:"구현 체크리스트", de:"Umsetzungs-Checkliste"},
+  clLead:{ja:"チェックした状態はこのブラウザに保存されます。Markdown にしてチケットや README に貼れます。", en:"Checked items are saved in this browser. Copy as Markdown to paste into a ticket or README.", ko:"체크한 상태는 이 브라우저에 저장됩니다. Markdown으로 복사해 티켓이나 README에 붙여 넣을 수 있습니다.", de:"Abgehakte Punkte werden in diesem Browser gespeichert. Als Markdown kopieren, um sie in ein Ticket oder README einzufügen."},
+  copyMd:{ja:"Markdown をコピー", en:"Copy Markdown", ko:"Markdown 복사", de:"Markdown kopieren"},
+  saveMd:{ja:".md で保存", en:"Save as .md", ko:".md로 저장", de:"Als .md speichern"},
+  specsH:{ja:"iPhone Duo のディスプレイ", en:"iPhone Duo displays", ko:"iPhone Duo 디스플레이", de:"Displays des iPhone Duo"},
+  thDisplay:{ja:"ディスプレイ", en:"Display", ko:"디스플레이", de:"Display"},
+  thPanel:{ja:"パネル(px)", en:"Panel (px)", ko:"패널(px)", de:"Panel (px)"},
+  thShot:{ja:"スクリーンショット(px)", en:"Screenshot (px)", ko:"스크린샷(px)", de:"Screenshot (px)"},
+  thPoints:{ja:"ポイント(3x)", en:"Points (3x)", ko:"포인트(3x)", de:"Punkte (3x)"},
+  thSize:{ja:"サイズクラス", en:"Size class", ko:"크기 클래스", de:"Size Class"},
+  rOuter:{ja:"外側 5.4 インチ", en:"Outer, 5.4-inch", ko:"외부 5.4인치", de:"Außen, 5,4 Zoll"},
+  rOuterSc:{ja:"縦: 幅 Compact / 高さ Regular。横: どちらも Compact", en:"Portrait: compact width, regular height. Landscape: both compact.", ko:"세로: 너비 Compact / 높이 Regular. 가로: 둘 다 Compact", de:"Hochformat: Breite compact, Höhe regular. Querformat: beides compact."},
+  rInner:{ja:"内側 7.6 インチ", en:"Inner, 7.6-inch", ko:"내부 7.6인치", de:"Innen, 7,6 Zoll"},
+  rInnerPt:{ja:"669 × 951(推定)", en:"669 × 951 (est.)", ko:"669 × 951 (추정)", de:"669 × 951 (geschätzt)"},
+  rInnerSc:{ja:"縦横とも Regular。対応する向きの設定は無視される", en:"Regular in both dimensions. Supported orientations are ignored.", ko:"가로세로 모두 Regular. 지원 방향 설정은 무시됨", de:"In beiden Richtungen regular. Unterstützte Ausrichtungen werden ignoriert."},
+  rRef:{ja:"参考: iPhone 18 Pro Max", en:"For reference: iPhone 18 Pro Max", ko:"참고: iPhone 18 Pro Max", de:"Zum Vergleich: iPhone 18 Pro Max"},
+  rRefSc:{ja:"縦: 幅 Compact / 高さ Regular", en:"Portrait: compact width, regular height.", ko:"세로: 너비 Compact / 높이 Regular", de:"Hochformat: Breite compact, Höhe regular."},
+  fNote:{ja:"この提案は Apple の Human Interface Guidelines「Designing for iPhone Duo」と Tech Talk の内容をもとにした一般的なパターンです。最終的な確認は Xcode 27.1 の Device Hub(iPhone Duo シミュレーター)で行ってください。", en:"These suggestions are general patterns based on Apple’s Human Interface Guidelines (“Designing for iPhone Duo”) and Tech Talks. Confirm the final result in Device Hub (the iPhone Duo simulator) in Xcode 27.1.", ko:"이 제안은 Apple Human Interface Guidelines ‘Designing for iPhone Duo’와 Tech Talk 내용을 바탕으로 한 일반적인 패턴입니다. 최종 확인은 Xcode 27.1의 Device Hub(iPhone Duo 시뮬레이터)에서 해 주세요.", de:"Diese Vorschläge sind allgemeine Muster auf Grundlage der Human Interface Guidelines („Designing for iPhone Duo“) und der Tech Talks von Apple. Prüfe das Ergebnis in Device Hub (iPhone Duo-Simulator) in Xcode 27.1."},
+  sources:{ja:"出典", en:"Sources", ko:"출처", de:"Quellen"},
+  fTm:{ja:"Apple、iPhone は Apple Inc. の商標です。このツールは Apple とは関係のない非公式ツールです。", en:"Apple and iPhone are trademarks of Apple Inc. This is an unofficial tool and is not affiliated with Apple.", ko:"Apple, iPhone은 Apple Inc.의 상표입니다. 이 도구는 Apple과 관련 없는 비공식 도구입니다.", de:"Apple und iPhone sind Marken von Apple Inc. Dies ist ein inoffizielles Tool ohne Verbindung zu Apple."},
+  langAria:{ja:"言語", en:"Language", ko:"언어", de:"Sprache"},
+  otherApp:{ja:"もう 1 つのアプリ", en:"Other app", ko:"다른 앱", de:"Andere App"},
+  letterbox:{ja:"上下に {n}pt ずつ余白 → 字幕・チャプター", en:"{n} pt above and below → captions, chapters", ko:"위아래 {n}pt 여백 → 자막·챕터", de:"je {n} pt oben und unten → Untertitel, Kapitel"},
+  fold:{ja:"折り目", en:"Fold", ko:"접힘", de:"Falz"},
+  svgAria:{ja:"{name}のレイアウト図", en:"Layout diagram: {name}", ko:"{name} 레이아웃 도식", de:"Layoutskizze: {name}"},
+  sCopied:{ja:"Markdown をコピーしました。", en:"Markdown copied.", ko:"Markdown을 복사했습니다.", de:"Markdown kopiert."},
+  sCopyFail:{ja:"コピーできませんでした。「.md で保存」を使ってください。", en:"Couldn’t copy. Use “Save as .md” instead.", ko:"복사하지 못했습니다. ‘.md로 저장’을 사용하세요.", de:"Kopieren nicht möglich. Nutze „Als .md speichern“."},
+  sSaved:{ja:"保存しました。", en:"Saved.", ko:"저장했습니다.", de:"Gespeichert."},
+  sCanceled:{ja:"保存をキャンセルしました。", en:"Save canceled.", ko:"저장을 취소했습니다.", de:"Speichern abgebrochen."},
+  mdTitle:{ja:"iPhone Duo 対応メモ({cat})", en:"iPhone Duo plan: {cat}", ko:"iPhone Duo 대응 메모 ({cat})", de:"iPhone Duo-Plan: {cat}"},
+  mdApproach:{ja:"方針", en:"Approach", ko:"방침", de:"Ansatz"},
+  mdPoses:{ja:"ポーズ別レイアウト", en:"Layout by pose", ko:"자세별 레이아웃", de:"Layout nach Haltung"},
+  mdHead:{ja:"| ポーズ | サイズ | レイアウト |", en:"| Pose | Size | Layout |", ko:"| 자세 | 크기 | 레이아웃 |", de:"| Haltung | Größe | Layout |"},
+  mdBest:{ja:"(おすすめ)", en:" (best)", ko:" (추천)", de:" (empfohlen)"},
+  mdChecklist:{ja:"チェックリスト", en:"Checklist", ko:"체크리스트", de:"Checkliste"},
+  mdFoot:{ja:"参考: Apple Human Interface Guidelines「Designing for iPhone Duo」。Fold Planner で作成。", en:"Reference: Apple Human Interface Guidelines, “Designing for iPhone Duo”. Made with Fold Planner.", ko:"참고: Apple Human Interface Guidelines ‘Designing for iPhone Duo’. Fold Planner로 작성.", de:"Quelle: Apple Human Interface Guidelines, „Designing for iPhone Duo“. Erstellt mit Fold Planner."},
+};
+
 /* ---------- Poses (points) ---------- */
 const POSES = [
-  {id:"outer", name:"閉じた状態", w:466, h:678, bars:"side", camera:true, spec:"外側 466×678pt ・ 幅 Compact"},
-  {id:"innerL", name:"開いた状態・横", w:951, h:669, bars:"side", spec:"内側 951×669pt ・ 幅 Regular"},
-  {id:"innerP", name:"開いた状態・縦", w:669, h:951, bars:"top", spec:"内側 669×951pt ・ 幅 Regular ・ バーは上下"},
-  {id:"book", name:"半開き・ブック", w:951, h:669, bars:"side", fold:"v", spec:"内側を本のように開く ・ 折り目は縦"},
-  {id:"tabletop", name:"半開き・テーブルトップ", w:669, h:951, bars:"top", fold:"h", spec:"机に置いて L 字に開く ・ 折り目は横"},
-  {id:"split", name:"Split View(2 アプリ)", w:951, h:669, bars:"side", split:true, spec:"内側を 2 アプリで分割 ・ 自分の側は Compact 幅"},
+  {id:"outer", w:466, h:678, bars:"side", camera:true,
+   name:{ja:"閉じた状態", en:"Closed", ko:"닫힘", de:"Zugeklappt"},
+   spec:{ja:"外側 466×678pt ・ 幅 Compact", en:"Outer 466×678 pt · compact width", ko:"외부 466×678pt · 너비 Compact", de:"Außen 466×678 pt · Breite compact"}},
+  {id:"innerL", w:951, h:669, bars:"side",
+   name:{ja:"開いた状態・横", en:"Open, landscape", ko:"펼침·가로", de:"Aufgeklappt, quer"},
+   spec:{ja:"内側 951×669pt ・ 幅 Regular", en:"Inner 951×669 pt · regular width", ko:"내부 951×669pt · 너비 Regular", de:"Innen 951×669 pt · Breite regular"}},
+  {id:"innerP", w:669, h:951, bars:"top",
+   name:{ja:"開いた状態・縦", en:"Open, portrait", ko:"펼침·세로", de:"Aufgeklappt, hoch"},
+   spec:{ja:"内側 669×951pt ・ 幅 Regular ・ バーは上下", en:"Inner 669×951 pt · regular width · bars at top and bottom", ko:"내부 669×951pt · 너비 Regular · 바는 위아래", de:"Innen 669×951 pt · Breite regular · Leisten oben und unten"}},
+  {id:"book", w:951, h:669, bars:"side", fold:"v",
+   name:{ja:"半開き・ブック", en:"Half-folded, book", ko:"반쯤 접힘·북", de:"Halb gefaltet, Buch"},
+   spec:{ja:"内側を本のように開く ・ 折り目は縦", en:"Inner display open like a book · vertical fold", ko:"내부를 책처럼 펼침 · 세로 접힘", de:"Innendisplay wie ein Buch geöffnet · senkrechte Falz"}},
+  {id:"tabletop", w:669, h:951, bars:"top", fold:"h",
+   name:{ja:"半開き・テーブルトップ", en:"Half-folded, tabletop", ko:"반쯤 접힘·테이블탑", de:"Halb gefaltet, Tischmodus"},
+   spec:{ja:"机に置いて L 字に開く ・ 折り目は横", en:"Set on a table, open in an L shape · horizontal fold", ko:"책상에 놓고 L자로 펼침 · 가로 접힘", de:"Auf dem Tisch in L-Form geöffnet · waagerechte Falz"}},
+  {id:"split", w:951, h:669, bars:"side", split:true,
+   name:{ja:"Split View(2 アプリ)", en:"Split View (two apps)", ko:"Split View (앱 2개)", de:"Split View (zwei Apps)"},
+   spec:{ja:"内側を 2 アプリで分割 ・ 自分の側は Compact 幅", en:"Two apps share the inner display · your side is compact width", ko:"내부를 앱 2개가 나눠 씀 · 내 앱은 너비 Compact", de:"Zwei Apps teilen sich das Innendisplay · deine Seite hat Breite compact"}},
 ];
 const RAIL = 56, FOLD = 22, SCALE = 0.46;
 
 /* ---------- Layout patterns ---------- */
+const N = (ja, en, ko, de) => ({ja, en, ko, de});
 const PATTERNS = {
-  listDetail:{kinds:["list","detail"],
-    outer:{arr:"single", note:"一覧だけを表示し、詳細はタップでプッシュ遷移。バーは右端に縦並び。"},
-    innerL:{arr:"side", r:.36, note:"一覧と詳細を左右に並べる。分割ビューが自動で展開する。"},
-    innerP:{arr:"side", r:.42, note:"縦でも幅は Regular なので 2 カラムを維持。バーは上下に戻る。"},
-    book:{arr:"fold", note:"折り目を境に一覧と詳細をほぼ同じ幅に。標準の分割ビューは自動でこう調整される。"},
-    tabletop:{arr:"fold", swap:true, note:"上半分で読み、手元の下半分で選ぶ。"},
-    split:{arr:"single", note:"画面の半分は Compact 幅。外側と同じ 1 カラムに戻る。"},
-    headline:"閉じたら 1 カラム、開いたら一覧と詳細の 2 カラム。この切り替えをサイズクラスだけで行う。",
-    best:"book"},
-  feed:{kinds:["feed","detail"],
-    outer:{arr:"single", note:"1 カラムのフィード。横幅が広いので画像は少し低めの比率に。"},
-    innerL:{arr:"side", r:.52, note:"フィードは読みやすい幅に保ち、右に詳細や返信を出す。"},
-    innerP:{arr:"single", cols:2, note:"1 カラムを引き伸ばさず、2 列のカードにする。"},
-    book:{arr:"fold", note:"左でスクロール、右で開いた投稿を読む。"},
-    tabletop:{arr:"fold", swap:true, note:"上半分に投稿や動画、下半分に返信や入力欄。"},
-    split:{arr:"single", note:"1 カラムのフィードに戻る。"},
-    headline:"1 カラムを横に引き伸ばさない。広い画面では「詳細を横に出す」か「列を増やす」。",
-    best:"innerL"},
-  media:{kinds:["media","controls"],
-    outer:{arr:"stack", r:"16:9", note:"上にメディア、下に操作と情報。"},
-    innerL:{arr:"letterbox", note:"16:9 だと上下に計 130〜170pt の余白が出る。黒帯にせず、字幕・チャプター・操作を置く。"},
-    innerP:{arr:"stack", r:"16:9", note:"上にメディア、下に情報。縦に長いので一覧も見せられる。"},
-    book:{arr:"fold", note:"重ねて表示していたビューが、半開きでは左右に分かれる(オーバーレイ配置)。"},
-    tabletop:{arr:"fold", note:"上半分で視聴、下半分で操作。机に置いたまま使える一番の見せ場。"},
-    split:{arr:"stack", r:"16:9", note:"半分の幅でも上下構成で成立させる。"},
-    headline:"重ねて表示 ⇄ 左右・上下に分ける、のオーバーレイ配置が基本。",
-    best:"tabletop"},
-  grid:{kinds:["grid","detail"],
-    outer:{arr:"single", cols:3, note:"3 列のグリッド。外側には折り目がない。"},
-    innerL:{arr:"single", cols:6, note:"6 列。偶数列にしておくと半開きのときに真ん中で割れない。"},
-    innerP:{arr:"single", cols:4, note:"4 列。セルの大きさは外側とほぼ同じに保つ。"},
-    book:{arr:"fold", cols:2, note:"左にグリッド、右に選んだ項目の詳細。"},
-    tabletop:{arr:"fold", swap:true, cols:4, note:"上に選んだ項目を大きく、下でグリッドを選ぶ。"},
-    split:{arr:"single", cols:2, note:"2 列に減らす。"},
-    headline:"列数は偶数(内側横 6 列・縦 4 列)。折り目の上にセルを置かない。",
-    best:"book"},
-  canvas:{kinds:["canvas","panel"],
-    outer:{arr:"single", note:"キャンバスを最大に。ツールは右端の縦バーに。"},
-    innerL:{arr:"side", r:.74, note:"キャンバスの右にインスペクタ。"},
-    innerP:{arr:"stack", r:.72, note:"キャンバスの下にツールパネル。"},
-    book:{arr:"fold", note:"左右に分割。作品は折り目をまたがないよう片側に収める。"},
-    tabletop:{arr:"fold", note:"上半分がキャンバス、下半分がパレットやキーボード。"},
-    split:{arr:"single", note:"キャンバスのみ。パネルはシートで出す。"},
-    headline:"作業面と道具を分割配置(スプリット配置)にし、半開きでは道具を手元側へ。",
-    best:"tabletop"},
-  map:{kinds:["map","list"],
-    outer:{arr:"overlay", note:"地図の上に下からシート。"},
-    innerL:{arr:"overlay", note:"地図を全面に、検索結果は左上の浮いたパネルに。"},
-    innerP:{arr:"overlay", note:"地図の上に下からシート。"},
-    book:{arr:"fold", swap:true, note:"左に検索結果・経路、右に地図。地図は折り目をまたがせない。"},
-    tabletop:{arr:"fold", note:"上半分に地図、下半分に経路案内。"},
-    split:{arr:"overlay", note:"シートが半分の幅に収まる。"},
-    headline:"地図は全面、情報は重ねるパネル。半開きでは地図と情報を左右・上下に分ける。",
-    best:"book"},
-  dashboard:{kinds:["chart","cards"],
-    outer:{arr:"stack", r:.4, note:"上にグラフ、下に指標カード 2 列。"},
-    innerL:{arr:"side", r:.52, note:"左にグラフ、右に指標カード 2×2。"},
-    innerP:{arr:"stack", r:.36, note:"上にグラフ、下に指標カード。"},
-    book:{arr:"fold", note:"左にグラフ、右に指標。グラフを折り目でまたがせない。"},
-    tabletop:{arr:"fold", note:"上にグラフ、下に指標カード。"},
-    split:{arr:"stack", r:.4, note:"上下構成に戻る。"},
-    headline:"カードは偶数列で並べ、グラフは片側に収める。",
-    best:"innerL"},
-  reader:{kinds:["page","page"],
-    outer:{arr:"single", note:"1 ページずつ表示。"},
-    innerL:{arr:"side", r:.5, note:"見開き 2 ページ。境目を画面の中心(折り目の位置)に合わせる。"},
-    innerP:{arr:"single", note:"1 ページを大きく。"},
-    book:{arr:"fold", note:"本物の本のように見開きで読む。1 ページが折り目をまたがないこと。"},
-    tabletop:{arr:"fold", note:"上に本文、下に目次・メモ。"},
-    split:{arr:"single", note:"1 ページ表示に戻る。"},
-    headline:"√2 に近い内側画面は見開き向き。ページの境目は必ず中心に。",
-    best:"book"},
-  game:{kinds:["game","pad"], fullBleed:true,
-    outer:{arr:"single", note:"全画面。バーは出さず、HUD は右上カメラの位置を避ける。"},
-    innerL:{arr:"single", note:"レターボックスにせず、表示範囲(アスペクト比)を広げて埋める。"},
-    innerP:{arr:"single", note:"向きを固定していても画面を埋める。"},
-    book:{arr:"fold", note:"片側にゲーム、もう片側にマップや持ち物。"},
-    tabletop:{arr:"fold", note:"上半分がゲーム、下半分が操作パッド。"},
-    split:{arr:"single", note:"縮小されても文字とボタンの大きさは保つ。"},
-    headline:"どのポーズでも画面を埋める。黒帯より表示範囲を変える方を優先。",
-    best:"tabletop"},
-  camera:{kinds:["viewfinder","shutter"], fullBleed:false,
-    outer:{arr:"single", note:"ファインダーを全面に。シャッターは右端の縦バー側。"},
-    innerL:{arr:"side", r:.8, note:"大きなファインダーと操作列。"},
-    innerP:{arr:"stack", r:.8, note:"ファインダーの下にシャッター。"},
-    book:{arr:"fold", note:"左でファインダー、右で撮った写真を確認。"},
-    tabletop:{arr:"fold", note:"机に立てて上半分がファインダー、下半分が操作。セルフタイマー撮影向き。"},
-    split:{arr:"single", note:"ファインダーのみ。"},
-    headline:"内側・外側のカメラ切り替えと、被写体に向けた外側画面の使い方がポイント。",
-    best:"tabletop"},
+  listDetail:{kinds:["list","detail"], best:"book",
+    outer:{arr:"single", note:N("一覧だけを表示し、詳細はタップでプッシュ遷移。バーは右端に縦並び。","Show only the list; tapping pushes to the detail. Bars stack vertically on the right edge.","목록만 표시하고, 탭하면 상세 화면으로 푸시. 바는 오른쪽 끝에 세로로 배치.","Nur die Liste zeigen; ein Tippen öffnet die Details. Leisten stehen senkrecht am rechten Rand.")},
+    innerL:{arr:"side", r:.36, note:N("一覧と詳細を左右に並べる。分割ビューが自動で展開する。","List and detail side by side. The split view expands automatically.","목록과 상세를 좌우로 나란히. 분할 뷰가 자동으로 펼쳐짐.","Liste und Details nebeneinander. Die geteilte Ansicht klappt automatisch auf.")},
+    innerP:{arr:"side", r:.42, note:N("縦でも幅は Regular なので 2 カラムを維持。バーは上下に戻る。","Width is still regular in portrait, so keep two columns. Bars return to the top and bottom.","세로에서도 너비가 Regular라 2단을 유지. 바는 위아래로 돌아감.","Auch im Hochformat ist die Breite regular, also zwei Spalten beibehalten. Leisten wandern wieder nach oben und unten.")},
+    book:{arr:"fold", note:N("折り目を境に一覧と詳細をほぼ同じ幅に。標準の分割ビューは自動でこう調整される。","List and detail at about equal widths on either side of the fold. A standard split view adjusts like this on its own.","접힘을 경계로 목록과 상세를 거의 같은 너비로. 표준 분할 뷰는 자동으로 이렇게 조정됨.","Liste und Details links und rechts der Falz etwa gleich breit. Eine Standard-Split-View passt sich so von selbst an.")},
+    tabletop:{arr:"fold", swap:true, note:N("上半分で読み、手元の下半分で選ぶ。","Read on the top half; pick from the list on the bottom half.","위쪽 절반에서 읽고, 손 쪽 아래 절반에서 고름.","Oben lesen, unten in der Liste auswählen.")},
+    split:{arr:"single", note:N("画面の半分は Compact 幅。外側と同じ 1 カラムに戻る。","Half the screen is compact width, so fall back to a single column like the outer display.","화면 절반은 너비 Compact. 외부와 같은 1단으로 돌아감.","Die halbe Breite ist compact, also zurück zu einer Spalte wie auf dem Außendisplay.")},
+    headline:N("閉じたら 1 カラム、開いたら一覧と詳細の 2 カラム。この切り替えをサイズクラスだけで行う。","One column when closed, list plus detail when open. Switch between them using size classes only.","닫으면 1단, 펼치면 목록과 상세의 2단. 이 전환을 크기 클래스만으로 처리.","Zugeklappt eine Spalte, aufgeklappt Liste und Details. Der Wechsel erfolgt nur über Size Classes.")},
+  feed:{kinds:["feed","detail"], best:"innerL",
+    outer:{arr:"single", note:N("1 カラムのフィード。横幅が広いので画像は少し低めの比率に。","Single-column feed. The display is wide, so use slightly shorter image ratios.","1단 피드. 가로가 넓으니 이미지 비율은 약간 낮게.","Einspaltiger Feed. Das Display ist breit, daher etwas flachere Bildformate.")},
+    innerL:{arr:"side", r:.52, note:N("フィードは読みやすい幅に保ち、右に詳細や返信を出す。","Keep the feed at a readable width and show detail or replies on the right.","피드는 읽기 좋은 너비로 두고 오른쪽에 상세나 답글을 표시.","Feed in lesbarer Breite halten, rechts Details oder Antworten zeigen.")},
+    innerP:{arr:"single", cols:2, note:N("1 カラムを引き伸ばさず、2 列のカードにする。","Don’t stretch one column; switch to a two-column card layout.","1단을 늘리지 말고 2열 카드로.","Eine Spalte nicht strecken, sondern auf zwei Kartenspalten wechseln.")},
+    book:{arr:"fold", note:N("左でスクロール、右で開いた投稿を読む。","Scroll on the left, read the opened post on the right.","왼쪽에서 스크롤, 오른쪽에서 연 게시물을 읽음.","Links scrollen, rechts den geöffneten Beitrag lesen.")},
+    tabletop:{arr:"fold", swap:true, note:N("上半分に投稿や動画、下半分に返信や入力欄。","Post or video on the top half, replies and the composer on the bottom.","위쪽에 게시물·동영상, 아래쪽에 답글·입력란.","Oben Beitrag oder Video, unten Antworten und Eingabefeld.")},
+    split:{arr:"single", note:N("1 カラムのフィードに戻る。","Back to a single-column feed.","1단 피드로 돌아감.","Zurück zum einspaltigen Feed.")},
+    headline:N("1 カラムを横に引き伸ばさない。広い画面では「詳細を横に出す」か「列を増やす」。","Never stretch a single column. On wide screens, show detail alongside or add columns.","1단을 가로로 늘리지 않기. 넓은 화면에서는 ‘상세를 옆에’ 또는 ‘열 추가’.","Eine Spalte nie in die Breite ziehen. Auf breiten Displays Details daneben zeigen oder Spalten hinzufügen.")},
+  media:{kinds:["media","controls"], best:"tabletop",
+    outer:{arr:"stack", r:"16:9", note:N("上にメディア、下に操作と情報。","Media on top, controls and info below.","위에 미디어, 아래에 조작과 정보.","Oben Medien, darunter Steuerung und Infos.")},
+    innerL:{arr:"letterbox", note:N("16:9 だと上下に計 130〜170pt の余白が出る。黒帯にせず、字幕・チャプター・操作を置く。","16:9 leaves 130–170 pt of space above and below. Fill it with captions, chapters or controls instead of black bars.","16:9이면 위아래에 합계 130~170pt 여백이 생김. 검은 띠 대신 자막·챕터·조작을 배치.","16:9 lässt oben und unten insgesamt 130–170 pt frei. Statt schwarzer Balken Untertitel, Kapitel oder Steuerung platzieren.")},
+    innerP:{arr:"stack", r:"16:9", note:N("上にメディア、下に情報。縦に長いので一覧も見せられる。","Media on top, info below. It’s tall enough to show a list too.","위에 미디어, 아래에 정보. 세로가 길어 목록도 보여 줄 수 있음.","Oben Medien, darunter Infos. Hoch genug für eine Liste.")},
+    book:{arr:"fold", note:N("重ねて表示していたビューが、半開きでは左右に分かれる(オーバーレイ配置)。","Views that overlap when flat move to either side when half-folded (overlay arrangement).","겹쳐 표시하던 뷰가 반쯤 접으면 좌우로 나뉨(오버레이 배치).","Überlagerte Ansichten wandern im halb gefalteten Zustand auf beide Seiten (Overlay-Anordnung).")},
+    tabletop:{arr:"fold", note:N("上半分で視聴、下半分で操作。机に置いたまま使える一番の見せ場。","Watch on the top half, control on the bottom. It works while sitting on a table and shows the device at its best.","위쪽 절반에서 시청, 아래쪽 절반에서 조작. 책상에 둔 채 쓸 수 있는 최고의 장면.","Oben schauen, unten steuern. Funktioniert auf dem Tisch und zeigt das Gerät von seiner besten Seite.")},
+    split:{arr:"stack", r:"16:9", note:N("半分の幅でも上下構成で成立させる。","Keep the top-and-bottom layout at half width.","절반 너비에서도 위아래 구성을 유지.","Auch in halber Breite oben und unten aufteilen.")},
+    headline:N("重ねて表示 ⇄ 左右・上下に分ける、のオーバーレイ配置が基本。","The core is an overlay arrangement: layered when flat, split side by side or top and bottom when folded.","겹쳐 표시 ⇄ 좌우·위아래로 나누는 오버레이 배치가 기본.","Grundlage ist die Overlay-Anordnung: flach überlagert, gefaltet nebeneinander oder übereinander.")},
+  grid:{kinds:["grid","detail"], best:"book",
+    outer:{arr:"single", cols:3, note:N("3 列のグリッド。外側には折り目がない。","Three-column grid. The outer display has no fold.","3열 그리드. 외부 디스플레이에는 접힘이 없음.","Dreispaltiges Raster. Das Außendisplay hat keine Falz.")},
+    innerL:{arr:"single", cols:6, note:N("6 列。偶数列にしておくと半開きのときに真ん中で割れない。","Six columns. An even count means no cell is split when half-folded.","6열. 짝수 열이면 반쯤 접을 때 가운데에서 갈라지지 않음.","Sechs Spalten. Mit einer geraden Anzahl wird beim Falten keine Zelle geteilt.")},
+    innerP:{arr:"single", cols:4, note:N("4 列。セルの大きさは外側とほぼ同じに保つ。","Four columns. Keep cells about the same size as on the outer display.","4열. 셀 크기는 외부와 거의 같게 유지.","Vier Spalten. Zellen etwa so groß wie auf dem Außendisplay halten.")},
+    book:{arr:"fold", cols:2, note:N("左にグリッド、右に選んだ項目の詳細。","Grid on the left, details of the selected item on the right.","왼쪽에 그리드, 오른쪽에 선택한 항목의 상세.","Links das Raster, rechts Details zum ausgewählten Element.")},
+    tabletop:{arr:"fold", swap:true, cols:4, note:N("上に選んだ項目を大きく、下でグリッドを選ぶ。","Selected item large on top, choose from the grid below.","위에 선택한 항목을 크게, 아래 그리드에서 선택.","Oben das ausgewählte Element groß, unten im Raster auswählen.")},
+    split:{arr:"single", cols:2, note:N("2 列に減らす。","Drop to two columns.","2열로 줄임.","Auf zwei Spalten reduzieren.")},
+    headline:N("列数は偶数(内側横 6 列・縦 4 列)。折り目の上にセルを置かない。","Use an even number of columns (6 in landscape, 4 in portrait on the inner display) and keep cells off the fold.","열 수는 짝수(내부 가로 6열·세로 4열). 접힘 위에 셀을 두지 않기.","Gerade Spaltenzahl (innen quer 6, hoch 4) und keine Zellen auf der Falz.")},
+  canvas:{kinds:["canvas","panel"], best:"tabletop",
+    outer:{arr:"single", note:N("キャンバスを最大に。ツールは右端の縦バーに。","Maximize the canvas; tools live in the vertical bar on the right.","캔버스를 최대로. 도구는 오른쪽 세로 바에.","Leinwand maximieren, Werkzeuge in der senkrechten Leiste rechts.")},
+    innerL:{arr:"side", r:.74, note:N("キャンバスの右にインスペクタ。","Inspector to the right of the canvas.","캔버스 오른쪽에 인스펙터.","Inspektor rechts neben der Leinwand.")},
+    innerP:{arr:"stack", r:.72, note:N("キャンバスの下にツールパネル。","Tool panel below the canvas.","캔버스 아래에 도구 패널.","Werkzeugbereich unter der Leinwand.")},
+    book:{arr:"fold", note:N("左右に分割。作品は折り目をまたがないよう片側に収める。","Split left and right; keep the artwork on one side so it doesn’t cross the fold.","좌우 분할. 작품이 접힘을 넘지 않도록 한쪽에.","Links und rechts teilen; das Werk bleibt auf einer Seite und kreuzt die Falz nicht.")},
+    tabletop:{arr:"fold", note:N("上半分がキャンバス、下半分がパレットやキーボード。","Canvas on the top half, palette or keyboard on the bottom.","위쪽 절반은 캔버스, 아래쪽 절반은 팔레트나 키보드.","Oben die Leinwand, unten Palette oder Tastatur.")},
+    split:{arr:"single", note:N("キャンバスのみ。パネルはシートで出す。","Canvas only; show panels as sheets.","캔버스만. 패널은 시트로 표시.","Nur die Leinwand; Bereiche als Sheets zeigen.")},
+    headline:N("作業面と道具を分割配置(スプリット配置)にし、半開きでは道具を手元側へ。","Put the work surface and tools in a split arrangement, and move tools to the near half when folded.","작업면과 도구를 분할 배치하고, 반쯤 접으면 도구를 손 쪽으로.","Arbeitsfläche und Werkzeuge in einer Split-Anordnung; gefaltet wandern die Werkzeuge in die untere Hälfte.")},
+  map:{kinds:["map","list"], best:"book",
+    outer:{arr:"overlay", note:N("地図の上に下からシート。","A sheet rises from the bottom over the map.","지도 위에 아래에서 시트.","Ein Sheet schiebt sich von unten über die Karte.")},
+    innerL:{arr:"overlay", note:N("地図を全面に、検索結果は左上の浮いたパネルに。","Full-screen map with results in a floating panel at the top left.","지도를 전면에, 검색 결과는 왼쪽 위의 떠 있는 패널에.","Karte im Vollbild, Ergebnisse in einem schwebenden Bereich oben links.")},
+    innerP:{arr:"overlay", note:N("地図の上に下からシート。","A sheet rises from the bottom over the map.","지도 위에 아래에서 시트.","Ein Sheet schiebt sich von unten über die Karte.")},
+    book:{arr:"fold", swap:true, note:N("左に検索結果・経路、右に地図。地図は折り目をまたがせない。","Results and route on the left, map on the right. Keep the map off the fold.","왼쪽에 검색 결과·경로, 오른쪽에 지도. 지도가 접힘을 넘지 않게.","Links Ergebnisse und Route, rechts die Karte. Die Karte nicht über die Falz legen.")},
+    tabletop:{arr:"fold", note:N("上半分に地図、下半分に経路案内。","Map on top, directions below.","위쪽에 지도, 아래쪽에 경로 안내.","Oben die Karte, unten die Wegbeschreibung.")},
+    split:{arr:"overlay", note:N("シートが半分の幅に収まる。","The sheet fits in half the width.","시트가 절반 너비에 맞춰짐.","Das Sheet passt in die halbe Breite.")},
+    headline:N("地図は全面、情報は重ねるパネル。半開きでは地図と情報を左右・上下に分ける。","Map full-bleed, information in overlaid panels. When half-folded, split map and info across the fold.","지도는 전면, 정보는 겹치는 패널. 반쯤 접으면 지도와 정보를 좌우·위아래로 분리.","Karte randlos, Infos in überlagerten Bereichen. Halb gefaltet Karte und Infos über die Falz aufteilen.")},
+  dashboard:{kinds:["chart","cards"], best:"innerL",
+    outer:{arr:"stack", r:.4, note:N("上にグラフ、下に指標カード 2 列。","Chart on top, two columns of metric cards below.","위에 그래프, 아래에 지표 카드 2열.","Oben das Diagramm, darunter Kennzahlenkarten in zwei Spalten.")},
+    innerL:{arr:"side", r:.52, note:N("左にグラフ、右に指標カード 2×2。","Chart on the left, 2×2 metric cards on the right.","왼쪽에 그래프, 오른쪽에 지표 카드 2×2.","Links das Diagramm, rechts 2×2 Kennzahlenkarten.")},
+    innerP:{arr:"stack", r:.36, note:N("上にグラフ、下に指標カード。","Chart on top, metric cards below.","위에 그래프, 아래에 지표 카드.","Oben das Diagramm, darunter die Karten.")},
+    book:{arr:"fold", note:N("左にグラフ、右に指標。グラフを折り目でまたがせない。","Chart on the left, metrics on the right. Keep the chart off the fold.","왼쪽에 그래프, 오른쪽에 지표. 그래프가 접힘을 넘지 않게.","Links das Diagramm, rechts die Kennzahlen. Das Diagramm nicht über die Falz legen.")},
+    tabletop:{arr:"fold", note:N("上にグラフ、下に指標カード。","Chart on top, metric cards below.","위에 그래프, 아래에 지표 카드.","Oben das Diagramm, unten die Karten.")},
+    split:{arr:"stack", r:.4, note:N("上下構成に戻る。","Back to a stacked layout.","위아래 구성으로 돌아감.","Zurück zur gestapelten Anordnung.")},
+    headline:N("カードは偶数列で並べ、グラフは片側に収める。","Lay cards out in even columns and keep charts on one side of the fold.","카드는 짝수 열로, 그래프는 한쪽에.","Karten in gerader Spaltenzahl, Diagramme auf einer Seite der Falz.")},
+  reader:{kinds:["page","page"], best:"book",
+    outer:{arr:"single", note:N("1 ページずつ表示。","One page at a time.","한 페이지씩 표시.","Eine Seite nach der anderen.")},
+    innerL:{arr:"side", r:.5, note:N("見開き 2 ページ。境目を画面の中心(折り目の位置)に合わせる。","Two-page spread with the gutter at the center of the screen, where the fold is.","두 페이지 펼침. 경계를 화면 중앙(접힘 위치)에 맞춤.","Doppelseite, der Bund liegt in der Bildschirmmitte, wo die Falz ist.")},
+    innerP:{arr:"single", note:N("1 ページを大きく。","One large page.","한 페이지를 크게.","Eine große Seite.")},
+    book:{arr:"fold", note:N("本物の本のように見開きで読む。1 ページが折り目をまたがないこと。","Read as a real two-page spread. No page should cross the fold.","진짜 책처럼 펼침으로 읽기. 한 페이지가 접힘을 넘지 않게.","Wie ein echtes Buch als Doppelseite lesen. Keine Seite über die Falz.")},
+    tabletop:{arr:"fold", note:N("上に本文、下に目次・メモ。","Text on top, contents and notes below.","위에 본문, 아래에 목차·메모.","Oben der Text, unten Inhalt und Notizen.")},
+    split:{arr:"single", note:N("1 ページ表示に戻る。","Back to single pages.","한 페이지 표시로 돌아감.","Zurück zu Einzelseiten.")},
+    headline:N("√2 に近い内側画面は見開き向き。ページの境目は必ず中心に。","The inner display is close to √2, ideal for two-page spreads. Always put the page break at the center.","√2에 가까운 내부 화면은 펼침 보기에 적합. 페이지 경계는 반드시 중앙에.","Das Innendisplay liegt nah an √2 und eignet sich für Doppelseiten. Der Seitenwechsel gehört immer in die Mitte.")},
+  game:{kinds:["game","pad"], fullBleed:true, best:"tabletop",
+    outer:{arr:"single", note:N("全画面。バーは出さず、HUD は右上カメラの位置を避ける。","Full screen with no bars; keep the HUD clear of the camera at the top right.","전체 화면. 바는 표시하지 않고 HUD는 오른쪽 위 카메라 위치를 피함.","Vollbild ohne Leisten; das HUD meidet die Kamera oben rechts.")},
+    innerL:{arr:"single", note:N("レターボックスにせず、表示範囲(アスペクト比)を広げて埋める。","Don’t letterbox. Widen the visible area (aspect ratio) to fill the screen.","레터박스 대신 보이는 범위(종횡비)를 넓혀 채움.","Kein Letterboxing. Den sichtbaren Bereich (Seitenverhältnis) erweitern.")},
+    innerP:{arr:"single", note:N("向きを固定していても画面を埋める。","Fill the screen even if you lock orientation.","방향을 고정해도 화면을 채움.","Den Bildschirm füllen, auch bei gesperrter Ausrichtung.")},
+    book:{arr:"fold", note:N("片側にゲーム、もう片側にマップや持ち物。","Game on one side, map or inventory on the other.","한쪽에 게임, 다른 쪽에 맵이나 소지품.","Auf einer Seite das Spiel, auf der anderen Karte oder Inventar.")},
+    tabletop:{arr:"fold", note:N("上半分がゲーム、下半分が操作パッド。","Game on top, virtual controller below.","위쪽 절반은 게임, 아래쪽 절반은 조작 패드.","Oben das Spiel, unten das virtuelle Steuerkreuz.")},
+    split:{arr:"single", note:N("縮小されても文字とボタンの大きさは保つ。","Keep text and button sizes even when scaled down.","축소되어도 글자와 버튼 크기는 유지.","Text- und Schaltflächengrößen auch verkleinert beibehalten.")},
+    headline:N("どのポーズでも画面を埋める。黒帯より表示範囲を変える方を優先。","Fill the screen in every pose. Prefer changing the visible area to adding black bars.","어떤 자세에서도 화면을 채우기. 검은 띠보다 보이는 범위 변경을 우선.","In jeder Haltung den Bildschirm füllen. Lieber den sichtbaren Bereich ändern als schwarze Balken.")},
+  camera:{kinds:["viewfinder","shutter"], best:"tabletop",
+    outer:{arr:"single", note:N("ファインダーを全面に。シャッターは右端の縦バー側。","Full-screen viewfinder; the shutter sits on the side of the vertical bar.","뷰파인더를 전면에. 셔터는 오른쪽 세로 바 쪽.","Sucher im Vollbild; der Auslöser liegt auf der Seite der senkrechten Leiste.")},
+    innerL:{arr:"side", r:.8, note:N("大きなファインダーと操作列。","Large viewfinder with a control column.","큰 뷰파인더와 조작 열.","Großer Sucher mit Bedienspalte.")},
+    innerP:{arr:"stack", r:.8, note:N("ファインダーの下にシャッター。","Shutter below the viewfinder.","뷰파인더 아래에 셔터.","Auslöser unter dem Sucher.")},
+    book:{arr:"fold", note:N("左でファインダー、右で撮った写真を確認。","Viewfinder on the left, review shots on the right.","왼쪽에서 뷰파인더, 오른쪽에서 찍은 사진 확인.","Links der Sucher, rechts die Aufnahmen.")},
+    tabletop:{arr:"fold", note:N("机に立てて上半分がファインダー、下半分が操作。セルフタイマー撮影向き。","Stand it on a table: viewfinder on top, controls below. Great for self-timer shots.","책상에 세워 위쪽은 뷰파인더, 아래쪽은 조작. 셀프 타이머 촬영에 적합.","Auf den Tisch stellen: oben Sucher, unten Bedienung. Ideal für Selbstauslöser.")},
+    split:{arr:"single", note:N("ファインダーのみ。","Viewfinder only.","뷰파인더만.","Nur der Sucher.")},
+    headline:N("内側・外側のカメラ切り替えと、被写体に向けた外側画面の使い方がポイント。","The key points are switching between the inner and outer cameras and turning the outer display toward your subject.","내부·외부 카메라 전환과, 피사체를 향한 외부 화면 활용이 포인트.","Entscheidend sind der Wechsel zwischen innerer und äußerer Kamera und das Außendisplay als Anzeige für die fotografierte Person.")},
 };
 
+const C3 = (ja, en, ko, de) => ({ja, en, ko, de});
 const CATS = [
-  {id:"mail", name:"メール・メッセージ", p:"listDetail", A:"スレッド一覧", B:"会話"},
-  {id:"sns", name:"SNS・フィード", p:"feed", A:"タイムライン", B:"投稿の詳細・返信"},
-  {id:"news", name:"ニュース・ブログ", p:"feed", A:"記事一覧", B:"記事本文"},
-  {id:"book", name:"電子書籍・マンガ", p:"reader", A:"左ページ", B:"右ページ", tt:"目次・メモ"},
-  {id:"video", name:"動画・配信", p:"media", A:"動画", B:"再生操作・エピソード"},
-  {id:"music", name:"音楽・ポッドキャスト", p:"media", A:"アートワーク", B:"再生操作・キュー", kindA:"art"},
-  {id:"recipe", name:"料理・レシピ", p:"media", A:"調理手順", B:"材料・タイマー", kindA:"page"},
-  {id:"photo", name:"写真・ギャラリー", p:"grid", A:"写真グリッド", B:"選んだ写真"},
-  {id:"shop", name:"ショッピング・EC", p:"grid", A:"商品グリッド", B:"商品詳細"},
-  {id:"map", name:"地図・ナビ・旅行", p:"map", A:"地図", B:"検索結果・経路"},
-  {id:"docs", name:"メモ・ドキュメント", p:"listDetail", A:"ファイル一覧", B:"エディタ"},
-  {id:"learn", name:"学習・教育", p:"listDetail", A:"レッスン一覧", B:"レッスン"},
-  {id:"draw", name:"お絵かき・写真編集", p:"canvas", A:"キャンバス", B:"ツール・レイヤー"},
-  {id:"finance", name:"家計簿・金融", p:"dashboard", A:"推移グラフ", B:"指標カード"},
-  {id:"fitness", name:"フィットネス・ヘルス", p:"dashboard", A:"アクティビティ", B:"記録カード"},
-  {id:"camera", name:"カメラ", p:"camera", A:"ファインダー", B:"シャッター・設定"},
-  {id:"game", name:"ゲーム", p:"game", A:"ゲーム画面", B:"操作パッド・マップ"},
+  {id:"mail", p:"listDetail", name:C3("メール・メッセージ","Mail & messaging","메일·메시지","Mail & Nachrichten"), A:C3("スレッド一覧","Thread list","스레드 목록","Threadliste"), B:C3("会話","Conversation","대화","Unterhaltung")},
+  {id:"sns", p:"feed", name:C3("SNS・フィード","Social & feeds","SNS·피드","Social & Feeds"), A:C3("タイムライン","Timeline","타임라인","Timeline"), B:C3("投稿の詳細・返信","Post & replies","게시물 상세·답글","Beitrag & Antworten")},
+  {id:"news", p:"feed", name:C3("ニュース・ブログ","News & blogs","뉴스·블로그","News & Blogs"), A:C3("記事一覧","Article list","기사 목록","Artikelliste"), B:C3("記事本文","Article","기사 본문","Artikel")},
+  {id:"book", p:"reader", name:C3("電子書籍・マンガ","Books & comics","전자책·만화","Bücher & Comics"), A:C3("左ページ","Left page","왼쪽 페이지","Linke Seite"), B:C3("右ページ","Right page","오른쪽 페이지","Rechte Seite"), tt:C3("目次・メモ","Contents & notes","목차·메모","Inhalt & Notizen")},
+  {id:"video", p:"media", name:C3("動画・配信","Video & streaming","동영상·스트리밍","Video & Streaming"), A:C3("動画","Video","동영상","Video"), B:C3("再生操作・エピソード","Playback & episodes","재생 조작·에피소드","Wiedergabe & Folgen")},
+  {id:"music", p:"media", kindA:"art", name:C3("音楽・ポッドキャスト","Music & podcasts","음악·팟캐스트","Musik & Podcasts"), A:C3("アートワーク","Artwork","아트워크","Cover"), B:C3("再生操作・キュー","Playback & queue","재생 조작·대기열","Wiedergabe & Warteschlange")},
+  {id:"recipe", p:"media", kindA:"page", name:C3("料理・レシピ","Cooking & recipes","요리·레시피","Kochen & Rezepte"), A:C3("調理手順","Steps","조리 순서","Arbeitsschritte"), B:C3("材料・タイマー","Ingredients & timer","재료·타이머","Zutaten & Timer")},
+  {id:"photo", p:"grid", name:C3("写真・ギャラリー","Photos & galleries","사진·갤러리","Fotos & Galerien"), A:C3("写真グリッド","Photo grid","사진 그리드","Fotoraster"), B:C3("選んだ写真","Selected photo","선택한 사진","Ausgewähltes Foto")},
+  {id:"shop", p:"grid", name:C3("ショッピング・EC","Shopping","쇼핑·커머스","Shopping"), A:C3("商品グリッド","Product grid","상품 그리드","Produktraster"), B:C3("商品詳細","Product details","상품 상세","Produktdetails")},
+  {id:"map", p:"map", name:C3("地図・ナビ・旅行","Maps, navigation & travel","지도·내비·여행","Karten, Navigation & Reisen"), A:C3("地図","Map","지도","Karte"), B:C3("検索結果・経路","Results & route","검색 결과·경로","Ergebnisse & Route")},
+  {id:"docs", p:"listDetail", name:C3("メモ・ドキュメント","Notes & documents","메모·문서","Notizen & Dokumente"), A:C3("ファイル一覧","File list","파일 목록","Dateiliste"), B:C3("エディタ","Editor","편집기","Editor")},
+  {id:"learn", p:"listDetail", name:C3("学習・教育","Learning & education","학습·교육","Lernen & Bildung"), A:C3("レッスン一覧","Lesson list","레슨 목록","Lektionsliste"), B:C3("レッスン","Lesson","레슨","Lektion")},
+  {id:"draw", p:"canvas", name:C3("お絵かき・写真編集","Drawing & photo editing","그림·사진 편집","Zeichnen & Fotobearbeitung"), A:C3("キャンバス","Canvas","캔버스","Leinwand"), B:C3("ツール・レイヤー","Tools & layers","도구·레이어","Werkzeuge & Ebenen")},
+  {id:"finance", p:"dashboard", name:C3("家計簿・金融","Finance & budgeting","가계부·금융","Finanzen & Budget"), A:C3("推移グラフ","Trend chart","추이 그래프","Verlaufsdiagramm"), B:C3("指標カード","Metric cards","지표 카드","Kennzahlenkarten")},
+  {id:"fitness", p:"dashboard", name:C3("フィットネス・ヘルス","Fitness & health","피트니스·헬스","Fitness & Gesundheit"), A:C3("アクティビティ","Activity","활동","Aktivität"), B:C3("記録カード","Log cards","기록 카드","Protokollkarten")},
+  {id:"camera", p:"camera", name:C3("カメラ","Camera","카메라","Kamera"), A:C3("ファインダー","Viewfinder","뷰파인더","Sucher"), B:C3("シャッター・設定","Shutter & settings","셔터·설정","Auslöser & Einstellungen")},
+  {id:"game", p:"game", name:C3("ゲーム","Games","게임","Spiele"), A:C3("ゲーム画面","Game view","게임 화면","Spielansicht"), B:C3("操作パッド・マップ","Controls & map","조작 패드·맵","Steuerung & Karte")},
 ];
 
 const MODS = [
-  {id:"tab", name:"タブバーがある", def:true},
-  {id:"task", name:"作業中心の画面がある(編集・入力など)"},
-  {id:"text", name:"文字入力が多い"},
-  {id:"video", name:"動画を再生する"},
-  {id:"cam", name:"カメラを使う"},
-  {id:"custom", name:"独自のツールバー・タブバーを使っている"},
-  {id:"orient", name:"画面の向きを固定している"},
-  {id:"faceid", name:"アプリ内に「Face ID」という文言がある"},
-  {id:"widget", name:"ウィジェットがまだない"},
-  {id:"ipad", name:"iPad 版があり、マルチウィンドウ対応"},
+  {id:"tab", def:true, name:C3("タブバーがある","Has a tab bar","탭 바가 있음","Hat eine Tab-Leiste")},
+  {id:"task", name:C3("作業中心の画面がある(編集・入力など)","Has task-focused screens (editing, input)","작업 중심 화면이 있음(편집·입력 등)","Hat aufgabenorientierte Ansichten (Bearbeiten, Eingabe)")},
+  {id:"text", name:C3("文字入力が多い","Lots of text input","글자 입력이 많음","Viel Texteingabe")},
+  {id:"video", name:C3("動画を再生する","Plays video","동영상을 재생함","Spielt Videos ab")},
+  {id:"cam", name:C3("カメラを使う","Uses the camera","카메라를 사용함","Nutzt die Kamera")},
+  {id:"custom", name:C3("独自のツールバー・タブバーを使っている","Uses custom toolbars or tab bars","자체 툴바·탭 바를 사용함","Nutzt eigene Symbol- oder Tab-Leisten")},
+  {id:"orient", name:C3("画面の向きを固定している","Locks screen orientation","화면 방향을 고정함","Sperrt die Bildschirmausrichtung")},
+  {id:"faceid", name:C3("アプリ内に「Face ID」という文言がある","Mentions “Face ID” in the app","앱 안에 ‘Face ID’라는 문구가 있음","Erwähnt „Face ID“ in der App")},
+  {id:"widget", name:C3("ウィジェットがまだない","No widget yet","아직 위젯이 없음","Noch kein Widget")},
+  {id:"ipad", name:C3("iPad 版があり、マルチウィンドウ対応","Has an iPad version with multiple windows","iPad 버전이 있고 멀티 윈도우 지원","Hat eine iPad-Version mit mehreren Fenstern")},
 ];
 
 /* ---------- State ---------- */
@@ -353,6 +425,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":
 const R = (x,y,w,h,cls,rx=0) => `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(0,w).toFixed(1)}" height="${Math.max(0,h).toFixed(1)}" rx="${rx}" class="${cls}"/>`;
 const C = (cx,cy,r,cls) => `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r}" class="${cls}"/>`;
 const L = (x1,y1,x2,y2,cls="s-line") => `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="${cls}"/>`;
+const labelWidth = text => [...text].reduce((a, ch) => a + (ch.charCodeAt(0) > 255 ? 25 : 14), 0) + 18;
 
 function textLines(x, y, w, h, n, step = 22){
   let o = ""; const rows = Math.min(n, Math.floor((h - 8) / step));
@@ -490,16 +563,15 @@ function drawKind(kind, x, y, w, h, opt = {}){
 }
 
 function label(x, y, text){
-  const w = [...text].reduce((a, ch) => a + (ch.charCodeAt(0) > 255 ? 25 : 14), 0) + 18;
-  return R(x + 8, y + 8, w, 36, "s-labelbg", 7) + `<text x="${x + 17}" y="${y + 34}" class="s-label">${esc(text)}</text>`;
+  return R(x + 8, y + 8, labelWidth(text), 36, "s-labelbg", 7) + `<text x="${x + 17}" y="${y + 34}" class="s-label">${esc(text)}</text>`;
 }
 
-function chrome(pose, cr, opts){
+function chrome(pose, opts){
   let o = "";
   const {w, h} = pose;
   if (opts.fullBleed) return o;
   if (pose.bars === "side"){
-    const rx = opts.railLeft ? cr.railX : w - RAIL;
+    const rx = opts.railLeft ? 0 : w - RAIL;
     o += R(rx, 0, RAIL, h, "s-chrome");
     const cx = rx + RAIL / 2;
     let y = 26;
@@ -535,27 +607,24 @@ function contentRect(pose, opts){
 function poseSVG(pose, cat, mods){
   const P = PATTERNS[cat.p], spec = P[pose.id];
   const kindA = cat.kindA || P.kinds[0], kindB = P.kinds[1];
-  const labA = cat.A, labB = pose.id === "tabletop" && cat.tt ? cat.tt : cat.B;
+  const labA = tr(cat.A), labB = tr(pose.id === "tabletop" && cat.tt ? cat.tt : cat.B);
   const opts = {tab: !!mods.tab && !P.fullBleed, fullBleed: !!P.fullBleed};
   const W = pose.w, H = pose.h;
-  let body = "", over = "";
-  let cr;
-  // Split View: my app on the left half, controls along its outer (left) edge
+  let body = "", over = "", cr;
   if (pose.split){
     const half = W / 2 - 5;
     body += R(W/2 + 5, 0, W/2 - 5, H, "s-other");
-    body += `<text x="${W*.75}" y="${H/2}" text-anchor="middle" class="s-tiny">もう 1 つのアプリ</text>`;
+    body += `<text x="${W*.75}" y="${H/2}" text-anchor="middle" class="s-tiny">${esc(tr(UI.otherApp))}</text>`;
     body += R(W/2 - 2, H/2 - 40, 4, 80, "s-wire", 2);
-    cr = {x:RAIL, y:0, w:half - RAIL, h:H};
-    over += chrome({...pose, w:half}, {railX:0}, {...opts, railLeft:true});
+    cr = opts.fullBleed ? {x:0, y:0, w:half, h:H} : {x:RAIL, y:0, w:half - RAIL, h:H};
+    over += chrome({...pose, w:half}, {...opts, railLeft:true});
   } else {
     cr = contentRect(pose, opts);
-    over += chrome(pose, cr, opts);
+    over += chrome(pose, opts);
   }
-  const A = (x,y,w,h,extra={}) => drawKind(kindA, x, y, w, h, {cols: spec.cols, ...extra}) + label(x, y, labA);
+  const A = (x,y,w,h) => drawKind(kindA, x, y, w, h, {cols: spec.cols}) + label(x, y, labA);
   const B = (x,y,w,h) => drawKind(kindB, x, y, w, h, {cols: spec.cols}) + label(x, y, labB);
   const {x, y, w, h} = cr;
-  const gap = 0;
   switch (spec.arr){
     case "single": body += A(x, y, w, h); break;
     case "side": { const aw = w * spec.r; body += A(x, y, aw, h) + R(x + aw, y, 2, h, "s-wire") + B(x + aw + 2, y, w - aw - 2, h); break; }
@@ -567,14 +636,14 @@ function poseSVG(pose, cat, mods){
       const mh = w * 9 / 16, top = y + (h - mh) / 2;
       body += R(x, y, w, h, "s-dark");
       body += drawKind(kindA, x, top, w, mh) + label(x, top, labA);
-      body += `<text x="${x + w/2}" y="${y + (top - y)/2 + 6}" text-anchor="middle" class="s-tiny" style="fill:#AEB6CC">上下に ${Math.round(top - y)}pt ずつ余白 → 字幕・チャプター</text>`;
+      body += `<text x="${x + w/2}" y="${y + (top - y)/2 + 6}" text-anchor="middle" class="s-tiny" style="fill:#AEB6CC">${esc(fmt(UI.letterbox, {n:Math.round(top - y)}))}</text>`;
       body += R(x + 24, top + mh + 14, w - 48, Math.max(0, y + h - top - mh - 28), "s-white\" style=\"opacity:.12", 10);
       body += `<text x="${x + w/2}" y="${top + mh + (y + h - top - mh)/2 + 6}" text-anchor="middle" class="s-tiny" style="fill:#AEB6CC">${esc(labB)}</text>`;
       break;
     }
     case "overlay": {
       body += drawKind(kindA, x, y, w, h, {cols: spec.cols});
-      { const lw = [...labA].reduce((a, ch) => a + (ch.charCodeAt(0) > 255 ? 25 : 14), 0) + 34; body += label(x + w - lw, y, labA); }
+      body += label(x + w - labelWidth(labA) - 16, y, labA);
       if (W > H && !pose.split){ const pw = w * .36; body += R(x + 18, y + 18, pw, h - 36, "s-labelbg", 16) + B(x + 18, y + 18, pw, h - 36); }
       else { const sh = h * .38; body += R(x, y + h - sh, w, sh, "s-labelbg", 18) + R(x + w/2 - 24, y + h - sh + 8, 48, 6, "s-wire", 3) + B(x, y + h - sh + 10, w, sh - 10); }
       break;
@@ -593,17 +662,17 @@ function poseSVG(pose, cat, mods){
       break;
     }
   }
-  // fold band on top
   let fold = "";
+  const foldTxt = esc(tr(UI.fold));
   if (pose.fold === "v"){
     fold += R(W/2 - FOLD/2, 0, FOLD, H, "s-fold") + L(W/2, 0, W/2, H, "s-foldline");
-    fold += `<text transform="translate(${W/2 + 6},${H/2 + 30}) rotate(-90)" class="s-foldtxt">折り目</text>`;
+    fold += `<text transform="translate(${W/2 + 6},${H/2 + 30}) rotate(-90)" class="s-foldtxt">${foldTxt}</text>`;
   } else if (pose.fold === "h"){
     fold += R(0, H/2 - FOLD/2, W, FOLD, "s-fold") + L(0, H/2, W, H/2, "s-foldline");
-    fold += `<text x="${W/2 - 26}" y="${H/2 + 6}" class="s-foldtxt">折り目</text>`;
+    fold += `<text x="${W/2}" y="${H/2 + 6}" text-anchor="middle" class="s-foldtxt">${foldTxt}</text>`;
   }
   const id = "clip-" + pose.id;
-  return `<svg viewBox="-4 -4 ${W + 8} ${H + 8}" role="img" aria-label="${esc(pose.name)}のレイアウト図">
+  return `<svg viewBox="-4 -4 ${W + 8} ${H + 8}" role="img" aria-label="${esc(fmt(UI.svgAria, {name:tr(pose.name)}))}">
     <defs><clipPath id="${id}"><rect x="0" y="0" width="${W}" height="${H}" rx="30"/></clipPath></defs>
     <rect x="0" y="0" width="${W}" height="${H}" rx="30" style="fill:var(--screen)"/>
     <g clip-path="url(#${id})">${body}${over}${fold}</g>
@@ -614,147 +683,242 @@ function poseSVG(pose, cat, mods){
 /* ---------- Advice ---------- */
 function summaryItems(cat, mods){
   const P = PATTERNS[cat.p], items = [];
-  items.push({t:"レイアウトの軸", d:P.headline});
-  items.push({t:"サイズクラスだけで分岐する", d:"外側は幅 Compact、内側は縦横とも Regular。画面サイズ・機種・向きで分岐するコードは、内側ディスプレイで想定外の表示になります。"});
-  if (mods.custom) items.push({t:"独自バーは縦に移動しない", d:"標準のツールバー・タブバーなら外側や横向きで自動的に右端へ縦配置されます。独自実装のバーは置き換えを検討してください。"});
-  else if (cat.p === "game") items.push({t:"黒帯を出さない", d:"Apple はレターボックスより表示範囲の変更を推奨。避けられないなら余白にアートワークを置きます。"});
-  else if (cat.p === "camera" || mods.cam) items.push({t:"外側の画面を被写体に向ける", d:"CameraCaptureAccessory を使うと、内側でアプリを操作しながら外側に被写体用の表示を出せます。"});
-  else if (["grid","dashboard","reader"].includes(cat.p)) items.push({t:"折り目の上に物を置かない", d:"半開きでは中央が予約領域になります。偶数列にして、中央をまたぐ要素は ReservedRegion API でずらします。"});
-  else items.push({t:"ツールバーは右端に縦に並ぶ", d:"外側と内側の横向きでは、ツールバー・タブバーが右端へ縦に移動します。項目にはタイトルと SF Symbols の両方を設定し、よく使うものに表示優先度を付けます。"});
+  items.push({t:C3("レイアウトの軸","Layout principle","레이아웃의 축","Layout-Prinzip"), d:P.headline});
+  items.push({t:C3("サイズクラスだけで分岐する","Branch on size classes only","크기 클래스로만 분기","Nur nach Size Classes verzweigen"),
+    d:C3("外側は幅 Compact、内側は縦横とも Regular。画面サイズ・機種・向きで分岐するコードは、内側ディスプレイで想定外の表示になります。",
+         "The outer display is compact width; the inner display is regular in both dimensions. Code that branches on screen size, device model or orientation will misbehave on the inner display.",
+         "외부는 너비 Compact, 내부는 가로세로 모두 Regular. 화면 크기·기종·방향으로 분기하는 코드는 내부 디스플레이에서 예상과 다르게 표시됩니다.",
+         "Das Außendisplay hat Breite compact, das Innendisplay ist in beiden Richtungen regular. Code, der nach Bildschirmgröße, Gerätemodell oder Ausrichtung verzweigt, verhält sich auf dem Innendisplay falsch.")});
+  if (mods.custom) items.push({t:C3("独自バーは縦に移動しない","Custom bars don’t move to the side","자체 바는 세로로 이동하지 않음","Eigene Leisten wandern nicht zur Seite"),
+    d:C3("標準のツールバー・タブバーなら外側や横向きで自動的に右端へ縦配置されます。独自実装のバーは置き換えを検討してください。",
+         "Standard toolbars and tab bars move to the right edge automatically on the outer display and in landscape. Consider replacing custom bars.",
+         "표준 툴바·탭 바는 외부 화면과 가로 방향에서 자동으로 오른쪽 끝에 세로 배치됩니다. 자체 구현한 바는 교체를 검토하세요.",
+         "Standard-Symbol- und Tab-Leisten wandern auf dem Außendisplay und im Querformat automatisch an den rechten Rand. Ersetze eigene Leisten nach Möglichkeit.")});
+  else if (cat.p === "game") items.push({t:C3("黒帯を出さない","Avoid black bars","검은 띠를 만들지 않기","Keine schwarzen Balken"),
+    d:C3("Apple はレターボックスより表示範囲の変更を推奨。避けられないなら余白にアートワークを置きます。",
+         "Apple recommends changing the visible area over letterboxing. If you can’t avoid it, put artwork in the padding.",
+         "Apple은 레터박스보다 보이는 범위 변경을 권장합니다. 피할 수 없다면 여백에 아트워크를 넣으세요.",
+         "Apple empfiehlt, den sichtbaren Bereich zu ändern statt Letterboxing. Lässt es sich nicht vermeiden, fülle den Rand mit Artwork.")});
+  else if (cat.p === "camera" || mods.cam) items.push({t:C3("外側の画面を被写体に向ける","Turn the outer display toward your subject","외부 화면을 피사체 쪽으로","Das Außendisplay zur fotografierten Person"),
+    d:C3("CameraCaptureAccessory を使うと、内側でアプリを操作しながら外側に被写体用の表示を出せます。",
+         "CameraCaptureAccessory lets you show UI for the subject on the outer display while the app runs on the inner one.",
+         "CameraCaptureAccessory를 쓰면 내부에서 앱을 조작하면서 외부에 피사체용 화면을 표시할 수 있습니다.",
+         "Mit CameraCaptureAccessory zeigst du auf dem Außendisplay eine Ansicht für die fotografierte Person, während die App innen läuft.")});
+  else if (["grid","dashboard","reader"].includes(cat.p)) items.push({t:C3("折り目の上に物を置かない","Keep content off the fold","접힘 위에 요소를 두지 않기","Nichts auf die Falz legen"),
+    d:C3("半開きでは中央が予約領域になります。偶数列にして、中央をまたぐ要素は ReservedRegion API でずらします。",
+         "When half-folded, the center becomes a reserved region. Use even columns and move anything that crosses the center with the ReservedRegion API.",
+         "반쯤 접으면 중앙이 예약 영역이 됩니다. 짝수 열로 하고, 중앙을 넘는 요소는 ReservedRegion API로 옮기세요.",
+         "Halb gefaltet wird die Mitte zum reservierten Bereich. Nutze gerade Spaltenzahlen und verschiebe Elemente über der Mitte mit der ReservedRegion-API.")});
+  else items.push({t:C3("ツールバーは右端に縦に並ぶ","Toolbars run down the right edge","툴바는 오른쪽 끝에 세로로","Symbolleisten stehen senkrecht am rechten Rand"),
+    d:C3("外側と内側の横向きでは、ツールバー・タブバーが右端へ縦に移動します。項目にはタイトルと SF Symbols の両方を設定し、よく使うものに表示優先度を付けます。",
+         "On the outer display and in landscape on the inner display, toolbars and tab bars move to the right edge. Give items both a title and an SF Symbol, and set visibility priorities on the ones used most.",
+         "외부와 내부 가로 방향에서는 툴바·탭 바가 오른쪽 끝에 세로로 이동합니다. 항목에는 제목과 SF Symbols를 모두 설정하고, 자주 쓰는 항목에 표시 우선순위를 지정하세요.",
+         "Auf dem Außendisplay und innen im Querformat wandern Symbol- und Tab-Leisten an den rechten Rand. Gib Elementen Titel und SF Symbol und setze für häufig genutzte eine Sichtbarkeitspriorität.")});
   return items;
 }
 
+const I = (id, t, d) => ({id, t, d});
 function checklist(cat, mods){
   const P = cat.p, G = [];
   const g = (title, items) => G.push({title, items: items.filter(Boolean)});
-  g("ビルドとレイアウトの基本", [
-    {id:"sdk", t:"Xcode 27.1(iOS 27.1 SDK)でビルドする", d:"古い SDK のままだとステータスバーやカメラの下まで表示されず、画面の端まで使えません。"},
-    {id:"fullscreen", t:"Info.plist から UIRequiresFullScreen を外す", d:"iOS 27 SDK ではリサイズを止められません。開閉や Split View でサイズが変わる前提で作ります。"},
-    {id:"sizeclass", t:"画面サイズ・機種・向きではなくサイズクラスで分岐する", d:"内側ディスプレイは「対応する向き」の設定を無視します。horizontalSizeClass を見て組み立てます。"},
-    {id:"mainscreen", t:"UIScreen.main を参照しない", d:"画面が 2 つあるため、必要なら window scene から取得します。"},
-    {id:"insets", t:"左右の余白が非対称になる前提でセーフエリアを使う", d:"縦配置のバーは leading / trailing のインセットになります。左右が同じと仮定しないこと。"},
-    {id:"devicehub", t:"Device Hub の iPhone Duo シミュレーターで 6 つのポーズを確認する", d:"開く・閉じる・回転・折りたたみの操作ボタンがあります(Xcode 27.1)。"},
+  g(C3("ビルドとレイアウトの基本","Build and layout basics","빌드와 레이아웃 기본","Grundlagen: Build und Layout"), [
+    I("sdk", C3("Xcode 27.1(iOS 27.1 SDK)でビルドする","Build with Xcode 27.1 (iOS 27.1 SDK)","Xcode 27.1(iOS 27.1 SDK)로 빌드","Mit Xcode 27.1 (iOS 27.1 SDK) bauen"),
+      C3("古い SDK のままだとステータスバーやカメラの下まで表示されず、画面の端まで使えません。","With an older SDK the app doesn’t extend under the status bar and camera, so it can’t use the full screen.","이전 SDK로는 상태 바와 카메라 아래까지 표시되지 않아 화면 끝까지 쓸 수 없습니다.","Mit älterem SDK reicht die App nicht unter Statusleiste und Kamera und nutzt nicht den ganzen Bildschirm.")),
+    I("fullscreen", C3("Info.plist から UIRequiresFullScreen を外す","Remove UIRequiresFullScreen from Info.plist","Info.plist에서 UIRequiresFullScreen 제거","UIRequiresFullScreen aus der Info.plist entfernen"),
+      C3("iOS 27 SDK ではリサイズを止められません。開閉や Split View でサイズが変わる前提で作ります。","With the iOS 27 SDK you can’t opt out of resizing. Assume the size changes on open and close and in Split View.","iOS 27 SDK에서는 크기 조정을 막을 수 없습니다. 열고 닫을 때나 Split View에서 크기가 바뀐다는 전제로 만드세요.","Mit dem iOS 27 SDK lässt sich die Größenänderung nicht abschalten. Rechne mit Größenwechseln beim Auf- und Zuklappen und in Split View.")),
+    I("sizeclass", C3("画面サイズ・機種・向きではなくサイズクラスで分岐する","Branch on size classes, not screen size, device model or orientation","화면 크기·기종·방향이 아닌 크기 클래스로 분기","Nach Size Classes verzweigen, nicht nach Bildschirmgröße, Modell oder Ausrichtung"),
+      C3("内側ディスプレイは「対応する向き」の設定を無視します。horizontalSizeClass を見て組み立てます。","The inner display ignores your supported orientations. Read horizontalSizeClass and build from that.","내부 디스플레이는 ‘지원 방향’ 설정을 무시합니다. horizontalSizeClass를 보고 구성하세요.","Das Innendisplay ignoriert die unterstützten Ausrichtungen. Orientiere dich an horizontalSizeClass.")),
+    I("mainscreen", C3("UIScreen.main を参照しない","Don’t reference UIScreen.main","UIScreen.main을 참조하지 않기","UIScreen.main nicht verwenden"),
+      C3("画面が 2 つあるため、必要なら window scene から取得します。","There are two displays. Get the screen from the window scene when you need it.","화면이 2개이므로 필요하면 window scene에서 가져오세요.","Es gibt zwei Displays. Hole den Bildschirm bei Bedarf über die Window Scene.")),
+    I("insets", C3("左右の余白が非対称になる前提でセーフエリアを使う","Use safe areas and assume left and right insets differ","좌우 여백이 비대칭이라는 전제로 세이프 영역 사용","Safe Areas nutzen und mit ungleichen Rändern links und rechts rechnen"),
+      C3("縦配置のバーは leading / trailing のインセットになります。左右が同じと仮定しないこと。","Vertical bars become leading and trailing insets. Don’t assume both sides are equal.","세로 배치된 바는 leading / trailing 인셋이 됩니다. 좌우가 같다고 가정하지 마세요.","Senkrechte Leisten werden zu Leading- und Trailing-Insets. Geh nicht von gleichen Seiten aus.")),
+    I("devicehub", C3("Device Hub の iPhone Duo シミュレーターで 6 つのポーズを確認する","Check all six poses in the iPhone Duo simulator in Device Hub","Device Hub의 iPhone Duo 시뮬레이터로 6가지 자세 확인","Alle sechs Haltungen im iPhone Duo-Simulator in Device Hub prüfen"),
+      C3("開く・閉じる・回転・折りたたみの操作ボタンがあります(Xcode 27.1)。","It has buttons to open, close, rotate and fold the device (Xcode 27.1).","열기·닫기·회전·접기 조작 버튼이 있습니다(Xcode 27.1).","Es gibt Tasten zum Auf- und Zuklappen, Drehen und Falten (Xcode 27.1).")),
   ]);
-  g("ツールバーとタブバー", [
-    mods.custom && {id:"custombar", t:"独自のバーを標準コンポーネントに置き換える", d:"標準のツールバー・タブバーなら縦配置が自動で行われます。"},
-    {id:"label", t:"ツールバー項目にタイトルと SF Symbols の両方を設定する", d:"SwiftUI は Label、UIKit は UIBarButtonItem。文字だけのボタンは横のバーに残るので最小限に。"},
-    {id:"priority", t:"よく使う項目に表示優先度を付ける", d:"<code>ToolbarItemVisibilityPriority</code> / <code>UIBarButtonItemVisibilityPriority</code>。既定では下から順にオーバーフローします。"},
-    {id:"order", t:"縦の並びは上から「戻る・閉じる」→「完了」などの主要操作", d:"項目は元のグループのまま。間隔は ToolbarItemGroup に任せ、固定スペースを入れない。"},
-    {id:"overflow", t:"独自の「…」メニューはシステムのオーバーフローメニューに統合する", d:"<code>ToolbarOverflowMenu</code> / <code>additionalOverflowItems</code>。"},
-    mods.tab && {id:"compress", t: mods.task ? "作業中心の画面ではタブバーを最小化してツールバーを残す" : "スペース不足時はツールバー項目をオーバーフローさせ、タブバーを残す(既定)", d:"<code>ToolbarVerticalCompressionBehavior</code> / <code>UIVerticalBarCompressionBehavior</code> で切り替えます。"},
+  g(C3("ツールバーとタブバー","Toolbars and tab bars","툴바와 탭 바","Symbol- und Tab-Leisten"), [
+    mods.custom && I("custombar", C3("独自のバーを標準コンポーネントに置き換える","Replace custom bars with standard components","자체 바를 표준 컴포넌트로 교체","Eigene Leisten durch Standardkomponenten ersetzen"),
+      C3("標準のツールバー・タブバーなら縦配置が自動で行われます。","Standard toolbars and tab bars get the vertical layout automatically.","표준 툴바·탭 바라면 세로 배치가 자동으로 적용됩니다.","Standard-Symbol- und Tab-Leisten erhalten die senkrechte Anordnung automatisch.")),
+    I("label", C3("ツールバー項目にタイトルと SF Symbols の両方を設定する","Give toolbar items both a title and an SF Symbol","툴바 항목에 제목과 SF Symbols를 모두 설정","Symbolleistenelementen Titel und SF Symbol geben"),
+      C3("SwiftUI は Label、UIKit は UIBarButtonItem。文字だけのボタンは横のバーに残るので最小限に。","Label in SwiftUI, UIBarButtonItem in UIKit. Text-only buttons stay in a horizontal bar, so keep them to a minimum.","SwiftUI는 Label, UIKit은 UIBarButtonItem. 텍스트만 있는 버튼은 가로 바에 남으므로 최소한으로.","Label in SwiftUI, UIBarButtonItem in UIKit. Reine Textschaltflächen bleiben in einer waagerechten Leiste, also sparsam einsetzen.")),
+    I("priority", C3("よく使う項目に表示優先度を付ける","Set visibility priorities on frequently used items","자주 쓰는 항목에 표시 우선순위 지정","Häufig genutzten Elementen eine Sichtbarkeitspriorität geben"),
+      C3("<code>ToolbarItemVisibilityPriority</code> / <code>UIBarButtonItemVisibilityPriority</code>。既定では下から順にオーバーフローします。","<code>ToolbarItemVisibilityPriority</code> / <code>UIBarButtonItemVisibilityPriority</code>. By default, items overflow from the bottom up.","<code>ToolbarItemVisibilityPriority</code> / <code>UIBarButtonItemVisibilityPriority</code>. 기본값으로는 아래부터 순서대로 오버플로됩니다.","<code>ToolbarItemVisibilityPriority</code> / <code>UIBarButtonItemVisibilityPriority</code>. Standardmäßig laufen Elemente von unten nach oben in den Überlauf.")),
+    I("order", C3("縦の並びは上から「戻る・閉じる」→「完了」などの主要操作","Order the vertical bar from the top: Back or Close, then prominent actions like Done","세로 순서는 위에서부터 ‘뒤로·닫기’ → ‘완료’ 등 주요 조작","Senkrechte Reihenfolge von oben: Zurück oder Schließen, dann Hauptaktionen wie Fertig"),
+      C3("項目は元のグループのまま。間隔は ToolbarItemGroup に任せ、固定スペースを入れない。","Keep items in their original groups. Let ToolbarItemGroup handle spacing; don’t add fixed spaces.","항목은 원래 그룹대로. 간격은 ToolbarItemGroup에 맡기고 고정 공백을 넣지 마세요.","Elemente in ihren Gruppen lassen. Abstände übernimmt ToolbarItemGroup; keine festen Abstände einfügen.")),
+    I("overflow", C3("独自の「…」メニューはシステムのオーバーフローメニューに統合する","Merge custom “…” menus into the system overflow menu","자체 ‘…’ 메뉴를 시스템 오버플로 메뉴로 통합","Eigene „…“-Menüs ins System-Überlaufmenü übernehmen"),
+      "<code>ToolbarOverflowMenu</code> / <code>additionalOverflowItems</code>"),
+    mods.tab && I("compress", mods.task
+        ? C3("作業中心の画面ではタブバーを最小化してツールバーを残す","On task-focused screens, minimize the tab bar and keep the toolbar","작업 중심 화면에서는 탭 바를 최소화하고 툴바를 유지","In aufgabenorientierten Ansichten die Tab-Leiste minimieren und die Symbolleiste behalten")
+        : C3("スペース不足時はツールバー項目をオーバーフローさせ、タブバーを残す(既定)","When space runs out, overflow toolbar items and keep the tab bar (default)","공간이 부족하면 툴바 항목을 오버플로하고 탭 바를 유지(기본값)","Bei Platzmangel Symbolleistenelemente in den Überlauf schieben und die Tab-Leiste behalten (Standard)"),
+      C3("<code>ToolbarVerticalCompressionBehavior</code> / <code>UIVerticalBarCompressionBehavior</code> で切り替えます。","Switch with <code>ToolbarVerticalCompressionBehavior</code> / <code>UIVerticalBarCompressionBehavior</code>.","<code>ToolbarVerticalCompressionBehavior</code> / <code>UIVerticalBarCompressionBehavior</code>로 전환합니다.","Umschalten mit <code>ToolbarVerticalCompressionBehavior</code> / <code>UIVerticalBarCompressionBehavior</code>.")),
   ]);
   const pat = {
-    listDetail:[{id:"splitview", t:"一覧と詳細は NavigationSplitView / UISplitViewController で組む", d:"外側では 1 カラムに折りたたまれ、内側で展開し、半開きでは折り目に合わせて幅が自動調整されます。"}],
-    feed:[{id:"measure", t:"本文の行長を読みやすい幅に制限する", d:"広い画面では 1 カラムを引き伸ばさず、詳細を横に出すか列を増やします。"},
-          {id:"feedsplit", t:"一覧と詳細の 2 ペインは NavigationSplitView で組む", d:"折り目への対応が自動で入ります。"}],
-    media:[{id:"overlay", t:"メディアと操作を ArrangementView(overlay)で配置する", d:"全開では重ね、半開きでは左右・上下に分かれます。UIKit は UIArrangementViewController。"},
-           {id:"letterbox", t:"内側・横の 16:9 で出る上下の余白に情報を置く", d:"全幅 951pt なら映像の高さは 535pt で、上下に計約 134pt が余ります。右端に縦のバーを出すと余白はさらに増えます。"},
-           {id:"tabletop", t:"テーブルトップ(上で視聴・下で操作)を確認する", d:"机に置いて使うのが Duo の代表的な使い方です。"}],
-    grid:[{id:"even", t:"グリッドの列数を偶数にする", d:"内側・横 6 列、縦 4 列が目安。半開きで中央に切れ目が来ても割り切れます。"},
-          {id:"cell", t:"セルの物理サイズをポーズ間でそろえる", d:"列数を増やして調整し、セルを大きく引き伸ばさない。"}],
-    canvas:[{id:"arrsplit", t:"作業面とパネルを ArrangementView(split)で配置する", d:"幅が広いと左右、縦長だと上下に自動で分割されます。"},
-            {id:"palette", t:"テーブルトップでは道具を下半分に", d:"上半分は作品、下半分はパレットやキーボード。"}],
-    map:[{id:"sheet", t:"情報パネルはシートかオーバーレイ配置で出す", d:"シートは折り目を避けて自動で動きます。"},
-         {id:"mapfold", t:"半開きでは地図と情報を左右(上下)に分ける", d:"地図の注目点が折り目に来ないようにします。"}],
-    dashboard:[{id:"cardseven", t:"指標カードは偶数列で並べる", d:"2 列 × n 行が外側・内側の両方で崩れにくい構成です。"},
-               {id:"chartfold", t:"グラフを折り目でまたがせない", d:"ReservedRegion API で片側に寄せます。"}],
-    reader:[{id:"spread", t:"見開き表示の境目を画面の中心に合わせる", d:"開いていても半開きでも、ページの境目が折り目と一致します。"},
-            {id:"onepage", t:"1 ページを折り目にまたがせない", d:"内側・縦では 1 ページ表示に切り替えます。"}],
-    game:[{id:"fill", t:"どのポーズでも画面を埋める", d:"向きを固定していても、開閉でサイズが変わります。表示範囲(アスペクト比)を変えて対応します。"},
-          {id:"padding", t:"どうしても余白が出るならアートワークを置く", d:"黒帯は「全画面ではない」印象になります。"},
-          {id:"hud", t:"文字とボタンの大きさをポーズ間でそろえる", d:"HUD は折り目と外側のカメラ位置を避けます。"}],
-    camera:[{id:"vfc", t:"Virtual Front Camera を使う", d:"開くと内側、閉じると外側の前面カメラに自動で切り替わる AVCaptureDevice です。"},
-            {id:"accessory", t:"CameraCaptureAccessory で外側に被写体用 UI を出す", d:"内側で全画面かつカメラセッション中に使えます。撮られる人に表示を見せられます。"}],
+    listDetail:[I("splitview", C3("一覧と詳細は NavigationSplitView / UISplitViewController で組む","Build list and detail with NavigationSplitView / UISplitViewController","목록과 상세는 NavigationSplitView / UISplitViewController로 구성","Liste und Details mit NavigationSplitView / UISplitViewController bauen"),
+      C3("外側では 1 カラムに折りたたまれ、内側で展開し、半開きでは折り目に合わせて幅が自動調整されます。","It collapses to one column on the outer display, expands on the inner display and adjusts widths to the fold when half-folded.","외부에서는 1단으로 접히고, 내부에서 펼쳐지며, 반쯤 접으면 접힘에 맞춰 너비가 자동 조정됩니다.","Klappt außen auf eine Spalte zusammen, öffnet sich innen und passt halb gefaltet die Breiten an die Falz an."))],
+    feed:[I("measure", C3("本文の行長を読みやすい幅に制限する","Limit body text to a readable line length","본문 줄 길이를 읽기 좋은 너비로 제한","Fließtext auf eine lesbare Zeilenlänge begrenzen"),
+            C3("広い画面では 1 カラムを引き伸ばさず、詳細を横に出すか列を増やします。","On wide screens, don’t stretch one column; show detail alongside or add columns.","넓은 화면에서는 1단을 늘리지 말고 상세를 옆에 두거나 열을 늘리세요.","Auf breiten Displays keine Spalte strecken; Details daneben zeigen oder Spalten ergänzen.")),
+          I("feedsplit", C3("一覧と詳細の 2 ペインは NavigationSplitView で組む","Build two-pane list and detail with NavigationSplitView","목록·상세 2분할은 NavigationSplitView로 구성","Zweigeteilte Liste und Details mit NavigationSplitView bauen"),
+            C3("折り目への対応が自動で入ります。","Fold handling comes built in.","접힘 대응이 자동으로 들어갑니다.","Die Falz wird automatisch berücksichtigt."))],
+    media:[I("overlay", C3("メディアと操作を ArrangementView(overlay)で配置する","Arrange media and controls with ArrangementView (overlay)","미디어와 조작을 ArrangementView(overlay)로 배치","Medien und Steuerung mit ArrangementView (Overlay) anordnen"),
+             C3("全開では重ね、半開きでは左右・上下に分かれます。UIKit は UIArrangementViewController。","Layered when fully open, split side by side or top and bottom when half-folded. UIKit: UIArrangementViewController.","완전히 펼치면 겹치고, 반쯤 접으면 좌우·위아래로 나뉩니다. UIKit은 UIArrangementViewController.","Ganz geöffnet überlagert, halb gefaltet nebeneinander oder übereinander. UIKit: UIArrangementViewController.")),
+           I("letterbox", C3("内側・横の 16:9 で出る上下の余白に情報を置く","Use the space above and below 16:9 video on the inner display in landscape","내부 가로의 16:9 위아래 여백에 정보를 배치","Den Raum über und unter 16:9-Video innen im Querformat nutzen"),
+             C3("全幅 951pt なら映像の高さは 535pt で、上下に計約 134pt が余ります。右端に縦のバーを出すと余白はさらに増えます。","At the full 951 pt width the video is 535 pt tall, leaving about 134 pt in total. With the vertical bar on the right there’s even more.","전체 너비 951pt라면 영상 높이는 535pt로 위아래 합계 약 134pt가 남습니다. 오른쪽에 세로 바를 표시하면 여백은 더 늘어납니다.","Bei voller Breite von 951 pt ist das Video 535 pt hoch, es bleiben insgesamt etwa 134 pt. Mit der senkrechten Leiste rechts wird es mehr.")),
+           I("tabletop", C3("テーブルトップ(上で視聴・下で操作)を確認する","Check tabletop (watch on top, control below)","테이블탑(위에서 시청·아래에서 조작) 확인","Tischmodus prüfen (oben schauen, unten steuern)"),
+             C3("机に置いて使うのが Duo の代表的な使い方です。","Using it on a table is one of the device’s signature uses.","책상에 놓고 쓰는 것이 Duo의 대표적인 사용법입니다.","Die Nutzung auf dem Tisch ist eine typische Anwendung des Geräts."))],
+    grid:[I("even", C3("グリッドの列数を偶数にする","Use an even number of grid columns","그리드 열 수를 짝수로","Gerade Spaltenzahl im Raster"),
+            C3("内側・横 6 列、縦 4 列が目安。半開きで中央に切れ目が来ても割り切れます。","Aim for 6 in landscape and 4 in portrait on the inner display, so the grid divides cleanly at the center when half-folded.","내부 가로 6열·세로 4열이 기준. 반쯤 접어 가운데가 갈라져도 딱 나뉩니다.","Innen quer 6, hoch 4 als Richtwert, damit das Raster halb gefaltet sauber in der Mitte teilt.")),
+          I("cell", C3("セルの物理サイズをポーズ間でそろえる","Keep cells the same physical size across poses","자세가 바뀌어도 셀의 물리적 크기를 맞추기","Zellen in allen Haltungen gleich groß halten"),
+            C3("列数を増やして調整し、セルを大きく引き伸ばさない。","Add columns rather than stretching cells.","열 수를 늘려 조정하고 셀을 크게 늘리지 마세요.","Lieber Spalten ergänzen als Zellen strecken."))],
+    canvas:[I("arrsplit", C3("作業面とパネルを ArrangementView(split)で配置する","Arrange the work surface and panel with ArrangementView (split)","작업면과 패널을 ArrangementView(split)로 배치","Arbeitsfläche und Bereich mit ArrangementView (Split) anordnen"),
+              C3("幅が広いと左右、縦に長いと上下に自動で分割されます。","It splits side by side when wide and top and bottom when tall.","가로가 넓으면 좌우, 세로로 길면 위아래로 자동 분할됩니다.","Breit wird nebeneinander geteilt, hoch übereinander.")),
+            I("palette", C3("テーブルトップでは道具を下半分に","In tabletop, put tools on the bottom half","테이블탑에서는 도구를 아래쪽 절반에","Im Tischmodus die Werkzeuge in die untere Hälfte"),
+              C3("上半分は作品、下半分はパレットやキーボード。","Artwork on top, palette or keyboard below.","위쪽은 작품, 아래쪽은 팔레트나 키보드.","Oben das Werk, unten Palette oder Tastatur."))],
+    map:[I("sheet", C3("情報パネルはシートかオーバーレイ配置で出す","Show info panels as sheets or in an overlay arrangement","정보 패널은 시트나 오버레이 배치로","Infobereiche als Sheets oder in Overlay-Anordnung zeigen"),
+           C3("シートは折り目を避けて自動で動きます。","Sheets move away from the fold automatically.","시트는 접힘을 피해 자동으로 움직입니다.","Sheets weichen der Falz automatisch aus.")),
+         I("mapfold", C3("半開きでは地図と情報を左右(上下)に分ける","When half-folded, split map and info across the fold","반쯤 접으면 지도와 정보를 좌우(위아래)로 분리","Halb gefaltet Karte und Infos über die Falz aufteilen"),
+           C3("地図の注目点が折り目に来ないようにします。","Keep the map’s focal point off the fold.","지도의 주목 지점이 접힘에 오지 않게 합니다.","Der Fokuspunkt der Karte darf nicht auf der Falz liegen."))],
+    dashboard:[I("cardseven", C3("指標カードは偶数列で並べる","Lay out metric cards in even columns","지표 카드는 짝수 열로","Kennzahlenkarten in gerader Spaltenzahl anordnen"),
+                 C3("2 列 × n 行が外側・内側の両方で崩れにくい構成です。","Two columns × n rows holds up on both the outer and inner displays.","2열 × n행이 외부·내부 모두에서 무너지지 않는 구성입니다.","Zwei Spalten × n Zeilen funktionieren außen wie innen.")),
+               I("chartfold", C3("グラフを折り目でまたがせない","Keep charts off the fold","그래프가 접힘을 넘지 않게","Diagramme nicht über die Falz legen"),
+                 C3("ReservedRegion API で片側に寄せます。","Move them to one side with the ReservedRegion API.","ReservedRegion API로 한쪽에 붙입니다.","Mit der ReservedRegion-API auf eine Seite verschieben."))],
+    reader:[I("spread", C3("見開き表示の境目を画面の中心に合わせる","Align the gutter of a two-page spread with the center of the screen","펼침 보기의 경계를 화면 중앙에 맞추기","Den Bund einer Doppelseite auf die Bildschirmmitte legen"),
+              C3("開いていても半開きでも、ページの境目が折り目と一致します。","Whether open or half-folded, the page break matches the fold.","펼쳐도 반쯤 접어도 페이지 경계가 접힘과 일치합니다.","Ob offen oder halb gefaltet, der Seitenwechsel liegt auf der Falz.")),
+            I("onepage", C3("1 ページを折り目にまたがせない","Don’t let a single page cross the fold","한 페이지가 접힘을 넘지 않게","Keine einzelne Seite über die Falz legen"),
+              C3("内側・縦では 1 ページ表示に切り替えます。","Switch to single pages in portrait on the inner display.","내부 세로에서는 한 페이지 표시로 전환합니다.","Innen im Hochformat auf Einzelseiten umschalten."))],
+    game:[I("fill", C3("どのポーズでも画面を埋める","Fill the screen in every pose","어떤 자세에서도 화면을 채우기","In jeder Haltung den Bildschirm füllen"),
+            C3("向きを固定していても、開閉でサイズが変わります。表示範囲(アスペクト比)を変えて対応します。","Even with a locked orientation, the size changes when the device opens or closes. Adapt by changing the visible area (aspect ratio).","방향을 고정해도 열고 닫을 때 크기가 바뀝니다. 보이는 범위(종횡비)를 바꿔 대응하세요.","Auch bei gesperrter Ausrichtung ändert sich die Größe beim Auf- und Zuklappen. Passe den sichtbaren Bereich (Seitenverhältnis) an.")),
+          I("padding", C3("どうしても余白が出るならアートワークを置く","If padding is unavoidable, fill it with artwork","여백이 꼭 생긴다면 아트워크를 배치","Lässt sich ein Rand nicht vermeiden, ihn mit Artwork füllen"),
+            C3("黒帯は「全画面ではない」印象になります。","Black bars make it feel less than full screen.","검은 띠는 ‘전체 화면이 아니다’라는 인상을 줍니다.","Schwarze Balken wirken nicht wie Vollbild.")),
+          I("hud", C3("文字とボタンの大きさをポーズ間でそろえる","Keep text and button sizes consistent across poses","글자와 버튼 크기를 자세 간에 맞추기","Text- und Schaltflächengrößen über alle Haltungen gleich halten"),
+            C3("HUD は折り目と外側のカメラ位置を避けます。","Keep the HUD clear of the fold and the outer camera.","HUD는 접힘과 외부 카메라 위치를 피합니다.","Das HUD meidet Falz und Außenkamera."))],
+    camera:[I("vfc", C3("Virtual Front Camera を使う","Use the Virtual Front Camera","Virtual Front Camera 사용","Die Virtual Front Camera verwenden"),
+              C3("開くと内側、閉じると外側の前面カメラに自動で切り替わる AVCaptureDevice です。","An AVCaptureDevice that switches automatically to the inner front camera when open and the outer one when closed.","펼치면 내부, 닫으면 외부 전면 카메라로 자동 전환되는 AVCaptureDevice입니다.","Ein AVCaptureDevice, das aufgeklappt automatisch zur inneren und zugeklappt zur äußeren Frontkamera wechselt.")),
+            I("accessory", C3("CameraCaptureAccessory で外側に被写体用 UI を出す","Show UI for the subject on the outer display with CameraCaptureAccessory","CameraCaptureAccessory로 외부에 피사체용 UI 표시","Mit CameraCaptureAccessory auf dem Außendisplay eine Ansicht für die fotografierte Person zeigen"),
+              C3("内側で全画面かつカメラセッション中に使えます。撮られる人に表示を見せられます。","Available when the app is full screen on the inner display with an active camera session. The person being photographed can see the display.","내부에서 전체 화면이고 카메라 세션 중일 때 쓸 수 있습니다. 찍히는 사람에게 화면을 보여 줄 수 있습니다.","Verfügbar, wenn die App innen im Vollbild läuft und eine Kamerasitzung aktiv ist. Die fotografierte Person sieht die Anzeige."))],
   };
-  g("このアプリのレイアウト", [
+  g(C3("このアプリのレイアウト","Layout for this app","이 앱의 레이아웃","Layout für diese App"), [
     ...pat[P],
-    {id:"fold", t:"自作コンポーネントは ReservedRegion API で折り目を避ける", d:"アラート・メニュー・シート・分割ビューは自動で避けます。<code>ReservedRegion</code>(SwiftUI / UIKit)。"},
-    {id:"subtle", t:"折りたたむときのレイアウト変化を最小限にする", d:"見えて押せる状態を保つのに必要な分だけ動かします。"},
+    I("fold", C3("自作コンポーネントは ReservedRegion API で折り目を避ける","Move custom components away from the fold with the ReservedRegion API","자체 컴포넌트는 ReservedRegion API로 접힘을 피하기","Eigene Komponenten mit der ReservedRegion-API von der Falz fernhalten"),
+      C3("アラート・メニュー・シート・分割ビューは自動で避けます。<code>ReservedRegion</code>(SwiftUI / UIKit)。","Alerts, menus, sheets and split views avoid it automatically. <code>ReservedRegion</code> (SwiftUI / UIKit).","알림·메뉴·시트·분할 뷰는 자동으로 피합니다. <code>ReservedRegion</code>(SwiftUI / UIKit).","Alerts, Menüs, Sheets und Split Views weichen automatisch aus. <code>ReservedRegion</code> (SwiftUI / UIKit).")),
+    I("subtle", C3("折りたたむときのレイアウト変化を最小限にする","Keep layout changes minimal as the device folds","접을 때의 레이아웃 변화를 최소한으로","Layoutänderungen beim Falten minimal halten"),
+      C3("見えて押せる状態を保つのに必要な分だけ動かします。","Move only what’s needed to keep things visible and tappable.","보이고 누를 수 있는 상태를 유지하는 데 필요한 만큼만 움직입니다.","Nur so viel bewegen, wie nötig ist, damit alles sichtbar und antippbar bleibt.")),
   ]);
-  g("機能ごとの対応", [
-    mods.text && {id:"textfold", t:"入力欄を折り目にかけない", d:"テーブルトップでは下半分がキーボードになりやすいので、入力中の欄は上半分に来るようにします。"},
-    mods.video && P !== "media" && {id:"videott", t:"動画はテーブルトップで上半分に表示されるか確認する", d:"ArrangementView(overlay)で重ねる構成にすると自動で上下に分かれます。"},
-    mods.cam && P !== "camera" && {id:"camacc", t:"カメラ利用画面で Virtual Front Camera と CameraCaptureAccessory を確認する", d:"内外のカメラ切り替えと、外側画面の活用。"},
-    mods.orient && {id:"orientlock", t:"向きの固定に頼らないレイアウトにする", d:"内側では対応する向きが無視され、Split View では縮小表示されます。"},
-    mods.faceid && {id:"touchid", t:"「Face ID」の文言を LAContext.biometryType で切り替える", d:"iPhone Duo は Touch ID です。<code>.touchID</code> のときの文言とアイコンを用意します。"},
-    mods.widget && {id:"widgetstandby", t:"ウィジェットかライブアクティビティを用意する", d:"Duo は充電中でなくても両画面で StandBy を使えます。机に置いた状態で常に見える場所です。"},
-    mods.ipad && {id:"scenes", t:"マルチウィンドウが Duo でも有効になることを確認する", d:"外側では新しいウィンドウを作れないため、シーンのリクエスト失敗を処理します。"},
-    !mods.ipad && {id:"scenes2", t:"Split View で幅が半分になったときの表示を確認する", d:"2 つのアプリで内側を分け合うと、自分のアプリは Compact 幅になります。"},
+  g(C3("機能ごとの対応","Feature-specific work","기능별 대응","Funktionsspezifisches"), [
+    mods.text && I("textfold", C3("入力欄を折り目にかけない","Keep input fields off the fold","입력란을 접힘에 걸치지 않기","Eingabefelder nicht auf die Falz legen"),
+      C3("テーブルトップでは下半分がキーボードになりやすいので、入力中の欄は上半分に来るようにします。","In tabletop the bottom half often becomes the keyboard, so make sure the active field sits on the top half.","테이블탑에서는 아래쪽 절반이 키보드가 되기 쉬우므로, 입력 중인 칸이 위쪽 절반에 오도록 합니다.","Im Tischmodus wird die untere Hälfte oft zur Tastatur. Das aktive Feld sollte oben liegen.")),
+    mods.video && P !== "media" && I("videott", C3("動画はテーブルトップで上半分に表示されるか確認する","Check that video sits on the top half in tabletop","테이블탑에서 동영상이 위쪽 절반에 표시되는지 확인","Prüfen, dass Video im Tischmodus oben liegt"),
+      C3("ArrangementView(overlay)で重ねる構成にすると自動で上下に分かれます。","Layering with ArrangementView (overlay) splits it into top and bottom automatically.","ArrangementView(overlay)로 겹치는 구성이면 자동으로 위아래로 나뉩니다.","Mit ArrangementView (Overlay) wird automatisch oben und unten geteilt.")),
+    mods.cam && P !== "camera" && I("camacc", C3("カメラ利用画面で Virtual Front Camera と CameraCaptureAccessory を確認する","Check Virtual Front Camera and CameraCaptureAccessory on camera screens","카메라 화면에서 Virtual Front Camera와 CameraCaptureAccessory 확인","Auf Kameraansichten Virtual Front Camera und CameraCaptureAccessory prüfen"),
+      C3("内外のカメラ切り替えと、外側画面の活用。","Switching between inner and outer cameras, and using the outer display.","내외부 카메라 전환과 외부 화면 활용.","Wechsel zwischen innerer und äußerer Kamera und Nutzung des Außendisplays.")),
+    mods.orient && I("orientlock", C3("向きの固定に頼らないレイアウトにする","Don’t rely on a locked orientation","방향 고정에 의존하지 않는 레이아웃","Nicht auf eine gesperrte Ausrichtung verlassen"),
+      C3("内側では対応する向きが無視され、Split View では縮小表示されます。","The inner display ignores supported orientations, and Split View scales the app.","내부에서는 지원 방향이 무시되고, Split View에서는 축소 표시됩니다.","Innen werden unterstützte Ausrichtungen ignoriert, und in Split View wird die App skaliert.")),
+    mods.faceid && I("touchid", C3("「Face ID」の文言を LAContext.biometryType で切り替える","Switch “Face ID” wording with LAContext.biometryType","‘Face ID’ 문구를 LAContext.biometryType으로 전환","„Face ID“-Texte über LAContext.biometryType umschalten"),
+      C3("iPhone Duo は Touch ID です。<code>.touchID</code> のときの文言とアイコンを用意します。","iPhone Duo uses Touch ID. Provide wording and icons for <code>.touchID</code>.","iPhone Duo는 Touch ID입니다. <code>.touchID</code>일 때의 문구와 아이콘을 준비하세요.","iPhone Duo nutzt Touch ID. Sieh Texte und Symbole für <code>.touchID</code> vor.")),
+    mods.widget && I("widgetstandby", C3("ウィジェットかライブアクティビティを用意する","Provide a widget or Live Activity","위젯이나 라이브 액티비티 준비","Ein Widget oder eine Live-Aktivität bereitstellen"),
+      C3("Duo は充電中でなくても両画面で StandBy を使えます。机に置いた状態で常に見える場所です。","iPhone Duo runs StandBy on either display, even when not charging. It’s always in view on a desk.","Duo는 충전 중이 아니어도 양쪽 화면에서 StandBy를 쓸 수 있습니다. 책상에 둔 상태에서 항상 보이는 자리입니다.","Das iPhone Duo nutzt StandBy auf beiden Displays, auch ohne Laden. Auf dem Schreibtisch ist es immer im Blick.")),
+    mods.ipad ? I("scenes", C3("マルチウィンドウが Duo でも有効になることを確認する","Confirm multiple windows also work on iPhone Duo","멀티 윈도우가 Duo에서도 작동하는지 확인","Prüfen, dass mehrere Fenster auch auf dem iPhone Duo funktionieren"),
+      C3("外側では新しいウィンドウを作れないため、シーンのリクエスト失敗を処理します。","New windows can’t be created on the outer display, so handle failed scene requests.","외부에서는 새 윈도우를 만들 수 없으므로 scene 요청 실패를 처리하세요.","Auf dem Außendisplay lassen sich keine neuen Fenster öffnen; fehlgeschlagene Scene-Anfragen abfangen."))
+    : I("scenes2", C3("Split View で幅が半分になったときの表示を確認する","Check the layout at half width in Split View","Split View에서 너비가 절반일 때의 표시 확인","Layout in halber Breite in Split View prüfen"),
+      C3("2 つのアプリで内側を分け合うと、自分のアプリは Compact 幅になります。","When two apps share the inner display, your app becomes compact width.","두 앱이 내부를 나눠 쓰면 내 앱은 너비 Compact가 됩니다.","Teilen sich zwei Apps das Innendisplay, hat deine App Breite compact.")),
   ]);
-  g("App Store 提出", [
-    {id:"shots", t:"iPhone Duo 用のスクリーンショットを用意する", d:"外側 1398×2034、内側 2007×2853(横向きも可)。2027 年 4 月以降の提出で必須になります。<!--repo-only--> <a href=\"/asset-press\">Asset Press</a> で作れます。<!--/repo-only-->"},
-    {id:"inuse", t:"スクリーンショットの過半数をアプリ使用中の画面にする", d:"4 枚なら 3 枚が使用中の画面であること(ガイドライン 2.3.3)。"},
+  g(C3("App Store 提出","App Store submission","App Store 제출","App Store-Einreichung"), [
+    I("shots", C3("iPhone Duo 用のスクリーンショットを用意する","Prepare iPhone Duo screenshots","iPhone Duo용 스크린샷 준비","Screenshots für das iPhone Duo vorbereiten"),
+      C3("外側 1398×2034、内側 2007×2853(横向きも可)。2027 年 4 月以降の提出で必須になります。<!--repo-only--> <a href=\"/asset-press\" data-keep-lang>Asset Press</a> で作れます。<!--/repo-only-->",
+         "Outer 1398×2034, inner 2007×2853 (landscape also accepted). Required for submissions from April 2027.<!--repo-only--> You can make them with <a href=\"/asset-press\" data-keep-lang>Asset Press</a>.<!--/repo-only-->",
+         "외부 1398×2034, 내부 2007×2853(가로도 가능). 2027년 4월부터 제출 시 필수입니다.<!--repo-only--> <a href=\"/asset-press\" data-keep-lang>Asset Press</a>로 만들 수 있습니다.<!--/repo-only-->",
+         "Außen 1398×2034, innen 2007×2853 (auch quer). Ab April 2027 bei Einreichungen Pflicht.<!--repo-only--> Erstellen kannst du sie mit <a href=\"/asset-press\" data-keep-lang>Asset Press</a>.<!--/repo-only-->")),
+    I("inuse", C3("スクリーンショットの過半数をアプリ使用中の画面にする","Make more than half of your screenshots show the app in use","스크린샷의 과반수를 앱 사용 중 화면으로","Mehr als die Hälfte der Screenshots muss die App in Benutzung zeigen"),
+      C3("4 枚なら 3 枚が使用中の画面であること(ガイドライン 2.3.3)。","With four screenshots, three must show the app in use (guideline 2.3.3).","4장이라면 3장이 사용 중 화면이어야 합니다(가이드라인 2.3.3).","Bei vier Screenshots müssen drei die App in Benutzung zeigen (Richtlinie 2.3.3).")),
   ]);
   return G;
 }
 
 /* ---------- Render ---------- */
+function applyStatic(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el => { const v = UI[el.dataset.i18n]; if (v) el.textContent = tr(v); });
+  $("langSel").setAttribute("aria-label", tr(UI.langAria));
+  keepLangLinks();
+}
+function keepLangLinks(){
+  document.querySelectorAll("a[data-keep-lang]").forEach(a => { const base = a.getAttribute("href").split("?")[0]; a.setAttribute("href", `${base}?lang=${lang}`); });
+}
+
 function render(){
   const cat = CATS.find(c => c.id === state.cat) || CATS[0];
   const P = PATTERNS[cat.p];
-  // summary
   const sum = $("summary"); sum.textContent = "";
   for (const it of summaryItems(cat, state.mods)){
-    const li = document.createElement("li"); const b = document.createElement("b"); b.textContent = it.t;
-    li.appendChild(b); li.appendChild(document.createTextNode(it.d)); sum.appendChild(li);
+    const li = document.createElement("li"); const b = document.createElement("b"); b.textContent = tr(it.t);
+    li.appendChild(b); li.appendChild(document.createTextNode(tr(it.d))); sum.appendChild(li);
   }
   const bestPose = POSES.find(p => p.id === P.best);
-  $("best").innerHTML = `<strong>見せ場のポーズ:${esc(bestPose.name)}</strong> ― ${esc(P[P.best].note)}`;
-  $("sumTitle").textContent = `${cat.name}アプリで、まず押さえる 3 点`;
-  // poses
+  const best = $("best"); best.textContent = "";
+  const strong = document.createElement("strong"); strong.textContent = fmt(UI.best, {pose:tr(bestPose.name)});
+  best.appendChild(strong); best.appendChild(document.createTextNode(" ― " + tr(P[P.best].note)));
+  $("sumTitle").textContent = fmt(UI.sumTitle, {cat:tr(cat.name)});
   const host = $("poses"); host.textContent = "";
   for (const pose of POSES){
     const fig = document.createElement("figure"); fig.className = "pose" + (pose.id === P.best ? " best" : "");
     fig.style.margin = "0"; fig.style.width = `${Math.round(pose.w * SCALE)}px`;
     fig.innerHTML = poseSVG(pose, cat, state.mods) +
-      `<figcaption><span class="pn">${esc(pose.name)}</span><span class="ps">${esc(pose.spec)}</span><span class="pnote">${esc(P[pose.id].note)}</span></figcaption>`;
+      `<figcaption><span class="pn" data-badge="${esc(tr(UI.badge))}">${esc(tr(pose.name))}</span><span class="ps">${esc(tr(pose.spec))}</span><span class="pnote">${esc(tr(P[pose.id].note))}</span></figcaption>`;
     host.appendChild(fig);
   }
-  // checklist
   const gh = $("groups"); gh.textContent = "";
   for (const grp of checklist(cat, state.mods)){
     const sec = document.createElement("div"); sec.className = "group box";
-    sec.innerHTML = `<h3>${esc(grp.title)}</h3><ul>${grp.items.map(it => `<li><label><input type="checkbox" data-id="${it.id}" ${state.done[it.id] ? "checked" : ""}><span><span class="t">${esc(it.t)}</span><span class="d">${it.d}</span></span></label></li>`).join("")}</ul>`;
+    sec.innerHTML = `<h3>${esc(tr(grp.title))}</h3><ul>${grp.items.map(it => `<li><label><input type="checkbox" data-id="${it.id}" ${state.done[it.id] ? "checked" : ""}><span><span class="t">${esc(tr(it.t))}</span><span class="d">${tr(it.d)}</span></span></label></li>`).join("")}</ul>`;
     gh.appendChild(sec);
   }
+  keepLangLinks();
 }
 
 function buildInputs(){
-  const cats = $("cats");
+  const sel = $("langSel");
+  for (const [k, v] of Object.entries(LANGS)){ const o = document.createElement("option"); o.value = k; o.textContent = v; sel.appendChild(o); }
+  sel.value = lang;
+  sel.addEventListener("change", () => {
+    lang = sel.value;
+    try { localStorage.setItem("unfoldkit:lang", lang); } catch(e) {}
+    try { const u = new URL(location.href); u.searchParams.set("lang", lang); history.replaceState(null, "", u); } catch(e) {}
+    applyStatic(); buildChoices(); render();
+  });
+  $("cats").addEventListener("change", e => { state.cat = e.target.value; persist(); render(); });
+  $("mods").addEventListener("change", e => { state.mods[e.target.value] = e.target.checked; persist(); render(); });
+  $("groups").addEventListener("change", e => { const id = e.target.dataset.id; if (id){ state.done[id] = e.target.checked; persist(); } });
+}
+function buildChoices(){
+  const cats = $("cats"); cats.textContent = "";
   for (const c of CATS){
     const l = document.createElement("label"); l.className = "chip";
     l.innerHTML = `<input type="radio" name="cat" value="${c.id}"><span></span>`;
-    l.lastChild.textContent = c.name; l.firstChild.checked = c.id === state.cat;
+    l.lastChild.textContent = tr(c.name); l.firstChild.checked = c.id === state.cat;
     cats.appendChild(l);
   }
-  const mods = $("mods");
+  const mods = $("mods"); mods.textContent = "";
   for (const m of MODS){
     if (!(m.id in state.mods) && m.def) state.mods[m.id] = true;
     const l = document.createElement("label");
     l.innerHTML = `<input type="checkbox" value="${m.id}"><span></span>`;
-    l.lastChild.textContent = m.name; l.firstChild.checked = !!state.mods[m.id];
+    l.lastChild.textContent = tr(m.name); l.firstChild.checked = !!state.mods[m.id];
     mods.appendChild(l);
   }
-  cats.addEventListener("change", e => { state.cat = e.target.value; persist(); render(); });
-  mods.addEventListener("change", e => { state.mods[e.target.value] = e.target.checked; persist(); render(); });
-  $("groups").addEventListener("change", e => { const id = e.target.dataset.id; if (id){ state.done[id] = e.target.checked; persist(); } });
 }
 
 /* ---------- Markdown export ---------- */
 function toMarkdown(){
   const cat = CATS.find(c => c.id === state.cat) || CATS[0], P = PATTERNS[cat.p];
   const strip = s => s.replace(/<!--repo-only-->[\s\S]*?<!--\/repo-only-->/g, "").replace(/<code>(.*?)<\/code>/g, "`$1`").replace(/<[^>]+>/g, "");
-  let md = `# iPhone Duo 対応メモ(${cat.name})\n\n`;
-  md += `## 方針\n\n`;
-  summaryItems(cat, state.mods).forEach((it, i) => md += `${i + 1}. **${it.t}** ${it.d}\n`);
-  md += `\n## ポーズ別レイアウト\n\n| ポーズ | サイズ | レイアウト |\n|---|---|---|\n`;
-  for (const p of POSES) md += `| ${p.name}${p.id === P.best ? "(おすすめ)" : ""} | ${p.spec} | ${P[p.id].note} |\n`;
-  md += `\n## チェックリスト\n`;
+  let md = `# ${fmt(UI.mdTitle, {cat:tr(cat.name)})}\n\n## ${tr(UI.mdApproach)}\n\n`;
+  summaryItems(cat, state.mods).forEach((it, i) => md += `${i + 1}. **${tr(it.t)}** ${tr(it.d)}\n`);
+  md += `\n## ${tr(UI.mdPoses)}\n\n${tr(UI.mdHead)}\n|---|---|---|\n`;
+  for (const p of POSES) md += `| ${tr(p.name)}${p.id === P.best ? tr(UI.mdBest) : ""} | ${tr(p.spec)} | ${tr(P[p.id].note)} |\n`;
+  md += `\n## ${tr(UI.mdChecklist)}\n`;
   for (const g of checklist(cat, state.mods)){
-    md += `\n### ${g.title}\n\n`;
-    for (const it of g.items) md += `- [${state.done[it.id] ? "x" : " "}] ${it.t}  \n  ${strip(it.d)}\n`;
+    md += `\n### ${tr(g.title)}\n\n`;
+    for (const it of g.items) md += `- [${state.done[it.id] ? "x" : " "}] ${tr(it.t)}  \n  ${strip(tr(it.d))}\n`;
   }
-  md += `\n---\n参考: Apple Human Interface Guidelines「Designing for iPhone Duo」。Fold Planner で作成。\n`;
+  md += `\n---\n${tr(UI.mdFoot)}\n`;
   return md;
 }
 async function saveFile(name, data){
@@ -769,15 +933,15 @@ async function saveFile(name, data){
 $("copyMd").addEventListener("click", () => {
   const md = toMarkdown(), st = $("status");
   if (navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(md).then(() => st.textContent = "Markdown をコピーしました。", () => st.textContent = "コピーできませんでした。「.md で保存」を使ってください。");
-  } else st.textContent = "このブラウザではコピーできません。「.md で保存」を使ってください。";
+    navigator.clipboard.writeText(md).then(() => st.textContent = tr(UI.sCopied), () => st.textContent = tr(UI.sCopyFail));
+  } else st.textContent = tr(UI.sCopyFail);
 });
 $("saveMd").addEventListener("click", async () => {
-  const ok = await saveFile(`iphone-duo-plan-${state.cat}.md`, toMarkdown());
-  $("status").textContent = ok ? "保存しました。" : "保存をキャンセルしました。";
+  const ok = await saveFile(`iphone-duo-plan-${state.cat}-${lang}.md`, toMarkdown());
+  $("status").textContent = tr(ok ? UI.sSaved : UI.sCanceled);
 });
 
-buildInputs(); render();
+buildInputs(); applyStatic(); buildChoices(); render();
 })();
 </script>
 </body>
